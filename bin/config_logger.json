@@ -1,0 +1,25 @@
+{
+  "level": "debug",
+  "encoding": "json",
+  "maxSize":  100,
+  "maxBackups" : 3,
+  "maxAge" : 28,
+  "encoderConfig": {
+    "messageKey": "Msg",
+    "levelKey": "Level",
+    "timeKey": "Time",
+    "nameKey": "Name",
+    "callerKey": "Caller",
+    "stacktraceKey": "St",
+    "levelEncoder": "capital",
+    "timeEncoder": "iso8601",
+    "durationEncoder": "string",
+    "callerEncoder": "short"
+  },
+  "outputPaths": [
+    "stdout"
+  ],
+  "errorOutputPaths": [
+    "stderr"
+  ]
+}
