@@ -3,7 +3,7 @@ package gohipernetFake
 
 const (
 	MAX_RECEIVE_BUFFER_SIZE = 8012
-	PACKET_HEADER_SIZE      = 4
+	PACKET_HEADER_SIZE      = 5
 	MAX_PACKET_SIZE         = 1024
 )
 

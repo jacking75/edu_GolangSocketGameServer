@@ -40,7 +40,7 @@ namespace csharp_test_client
 
             try
             {
-                byte[] ReadBuffer = new byte[2048];
+                byte[] ReadBuffer = new byte[4012];
                 var nRecv = Sock.Receive(ReadBuffer, 0, ReadBuffer.Length, SocketFlags.None);
 
                 if (nRecv == 0)

@@ -47,11 +47,6 @@ func (session *TcpSession) handleTcpRead(networkFunctor SessionNetworkFunctors) 
 	}
 }
 
-func (session *TcpSession) closeProcess() {
-	session.conn.Close()
-	session.NetworkFunctor.OnClose(session.SessionIndex, session.SeqIndex)
-}
-
 func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (int16, int) {
 	sessionIndex := session.SessionIndex
 	sessionUnique := session.SeqIndex
@@ -89,6 +84,11 @@ func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (i
 
 	startRecvPos = readAbleByte
 	return startRecvPos, NET_ERROR_NONE
+}
+
+func (session *TcpSession) closeProcess() {
+	session.conn.Close()
+	session.NetworkFunctor.OnClose(session.SessionIndex, session.SeqIndex)
 }
 
 // Send bytes to client

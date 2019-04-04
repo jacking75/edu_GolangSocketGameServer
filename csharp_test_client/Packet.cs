@@ -10,6 +10,7 @@ namespace csharp_test_client
     {
         public Int16 DataSize;
         public Int16 PacketID;
+        public SByte Type;
         public byte[] BodyData;
     }
 
