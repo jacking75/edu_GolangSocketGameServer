@@ -60,6 +60,8 @@ func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
 
 		if packet.Id == protocol.PACKET_ID_LOGIN_REQ {
 			ProcessPacketLogin(sessionIndex, sessionUniqueId, bodySize, bodyData)
+		} else if packet.Id == protocol.PACKET_ID_SESSION_CLOSE_SYS {
+			ProcessPacketSessionClosed(server,  sessionIndex, sessionUniqueId)
 		} else {
 			roomNumber, _ := connectedSessions.GetRoomNumber(sessionIndex)
 			server.RoomMgr.PacketProcess(roomNumber, packet)
@@ -108,6 +110,22 @@ func _sendLoginResult(sessionIndex int32, sessionUniqueId uint64, result int16) 
 }
 
 
+func ProcessPacketSessionClosed(server *ChatServer, sessionIndex int32, sessionUniqueId uint64) {
+	roomNumber, _ := connectedSessions.GetRoomNumber(sessionIndex)
 
+	if roomNumber > -1 {
+		packet := protocol.Packet{
+			sessionIndex,
+			sessionUniqueId,
+			protocol.PACKET_ID_ROOM_LEAVE_REQ,
+			0,
+			nil,
+		}
+
+		server.RoomMgr.PacketProcess(roomNumber, packet)
+	}
+
+	connectedSessions.RemoveSession(sessionIndex, true)
+}
 
 

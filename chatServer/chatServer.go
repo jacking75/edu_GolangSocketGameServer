@@ -32,7 +32,7 @@ type ChatServer struct {
 	RoomMgr *roomPkg.RoomManager
 }
 
-func createServer(netConfig NetworkConfig, appConfig configAppServer) {
+func createAnsStartServer(netConfig NetworkConfig, appConfig configAppServer) {
 	NTELIB_LOG_INFO("CreateServer !!!")
 
 	var server ChatServer
@@ -55,6 +55,9 @@ func createServer(netConfig NetworkConfig, appConfig configAppServer) {
 	server.RoomMgr = roomPkg.NewRoomManager(roomConfig)
 
 
+	go server.PacketProcess_goroutine()
+
+
 	networkFunctor := SessionNetworkFunctors{}
 	networkFunctor.OnConnect = server.OnConnect
 	networkFunctor.OnReceive = server.OnReceive
@@ -67,7 +70,6 @@ func createServer(netConfig NetworkConfig, appConfig configAppServer) {
 
 	NetLibInitNetwork(PACKET_HEADER_SIZE, PACKET_HEADER_SIZE)
 	NetLibStartNetwork(&netConfig, networkFunctor)
-
 
 	server.Stop()
 }
@@ -97,6 +99,8 @@ func (server *ChatServer) Stop() {
 
 func (server *ChatServer) OnConnect(sessionIndex int32, sessionUniqueID uint64) {
 	NTELIB_LOG_INFO("client OnConnect", zap.Int32("sessionIndex",sessionIndex), zap.Uint64("sessionUniqueId",sessionUniqueID))
+
+	connectedSessions.AddSession(sessionIndex, sessionUniqueID)
 }
 
 func (server *ChatServer) OnReceive(sessionIndex int32, sessionUniqueID uint64, data []byte) bool {
@@ -110,4 +114,28 @@ func (server *ChatServer) OnReceive(sessionIndex int32, sessionUniqueID uint64, 
 
 func (server *ChatServer) OnClose(sessionIndex int32, sessionUniqueID uint64) {
 	NTELIB_LOG_INFO("client OnCloseClientSession", zap.Int32("sessionIndex", sessionIndex), zap.Uint64("sessionUniqueId", sessionUniqueID))
+
+	server.disConnectClient(sessionIndex, sessionUniqueID)
+}
+
+func (server *ChatServer) disConnectClient(sessionIndex int32, sessionUniqueId uint64) {
+	// 로그인도 안한 유저라면 그냥 여기서 처리한다.
+	if connectedSessions.IsLoginUser(sessionIndex) == false {
+		NTELIB_LOG_INFO("DisConnectClient - Not Login User", zap.Int32("sessionIndex", sessionIndex))
+		connectedSessions.RemoveSession(sessionIndex, false)
+		return
+	}
+
+
+	packet := protocol.Packet {
+		sessionIndex,
+		sessionUniqueId,
+		protocol.PACKET_ID_SESSION_CLOSE_SYS,
+		0,
+		nil,
+	}
+
+	server.PacketChan <- packet
+
+	NTELIB_LOG_INFO("DisConnectClient - Login User", zap.Int32("sessionIndex", sessionIndex))
 }

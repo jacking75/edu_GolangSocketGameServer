@@ -15,7 +15,7 @@ func main() {
 	netConfig.WriteNetworkConfig(true)
 
 	// 아래 함수를 호출하면 강제적으로 종료 시킬 때까지 대기 상태가 된다.
-	createServer(netConfig, appConfig)
+	createAnsStartServer(netConfig, appConfig)
 }
 
 func parseAppConfig() (NetworkConfig, configAppServer) {

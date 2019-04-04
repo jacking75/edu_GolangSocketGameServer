@@ -15,15 +15,17 @@ namespace csharp_test_client
 
     public enum PACKET_ID : ushort
     {
+        // Ping(Heart-beat)
+        PACKET_ID_PING_REQ = 201,
+        PACKET_ID_PING_RES = 202,
+
+        PACKET_ID_ERROR_NTF = 203,
+
+
         // 로그인
         PACKET_ID_LOGIN_REQ = 701,
         PACKET_ID_LOGIN_RES = 702,
-
-        PACKET_ID_ERROR_NTF = 703,
-
-        // Ping(Heart-beat)
-        PACKET_ID_PING_REQ = 706,
-        PACKET_ID_PING_RES = 707,
+                
 
         PACKET_ID_ROOM_ENTER_REQ = 721,
         PACKET_ID_ROOM_ENTER_RES = 722,

@@ -62,18 +62,6 @@ func (roomMgr *RoomManager) _getRoomUserCount(roomId int32) int32 {
 	return roomMgr._roomList[roomId].getCurUserCount()
 }
 
-func (roomMgr *RoomManager) DisConnectedUser(roomNumber int32, sessionIndex int32, sessionUniqueId uint64) {
-	packet := protocol.Packet {
-		sessionIndex,
-		sessionUniqueId,
-		protocol.PACKET_ID_ROOM_LEAVE_REQ,
-		0,
-		nil,
-	}
-
-	roomMgr.PacketProcess(roomNumber, packet)
-}
-
 func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Packet) {
 	NTELIB_LOG_DEBUG("[[RoomManager - PacketProcess]]", zap.Int16("PacketID", packet.Id))
 
