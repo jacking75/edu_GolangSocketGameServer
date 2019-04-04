@@ -97,12 +97,12 @@ func (room *baseRoom) _initUserPool() {
 	}
 }
 
-func (room *baseRoom) _GetUserObject() *roomUser {
+func (room *baseRoom) _getUserObject() *roomUser {
 	userObject := room._userPool.Get().(*roomUser)
 	return userObject
 }
 
-func (room *baseRoom) _PutUserObject(user *roomUser) {
+func (room *baseRoom) _putUserObject(user *roomUser) {
 	room._userPool.Put(user)
 }
 
@@ -117,7 +117,7 @@ func (room *baseRoom) addUser(userInfo addRoomUserInfo) (*roomUser, int16) {
 
 	atomic.AddInt32(&room._curUserCount, 1)
 
-	user := room._GetUserObject()
+	user := room._getUserObject()
 	user.init(userInfo.userID, room.generateUserUniqueId())
 	user.SetNetworkInfo(userInfo.netSessionIndex, userInfo.netSessionUniqueId)
 	user.packetDataSize = user.PacketDataSize()
@@ -142,7 +142,7 @@ func (room *baseRoom) _removeUser(user *roomUser) {
 
 func (room *baseRoom) _removeUserObject(user *roomUser) {
 	atomic.AddInt32(&room._curUserCount, -1)
-	room._PutUserObject(user)
+	room._putUserObject(user)
 }
 
 func (room *baseRoom) getUser(sessionUniqueId uint64) *roomUser {
