@@ -1,7 +1,6 @@
 package main
 
 import (
-	"gohipernet"
 	"time"
 
 	. "golang_socketGameServer_codelab/gohipernetFake"
@@ -25,7 +24,7 @@ func (scheduler *TimerScheduler) _periodicLoop_goroutine() {
 
 	for {
 		if scheduler._periodicLoop_goroutine_Impl() {
-			gohipernet.NTELIB_LOG_INFO("Wanted Stop TimerScheduler goroutine !!!")
+			NTELIB_LOG_INFO("Wanted Stop TimerScheduler goroutine !!!")
 			break
 		}
 	}
@@ -39,15 +38,15 @@ func (scheduler *TimerScheduler) _periodicLoop_goroutine_Impl() bool {
 	secondTimeticker := time.NewTicker(time.Second)
 
 	time.Sleep(2 * time.Second) // 순서 종속성으로 인해 2초 뒤 시작한다.
-	defer gohipernet.PrintPanicStack()
+	defer PrintPanicStack()
 	defer secondTimeticker.Stop()
 
 	for {
 		select {
-		case secondTime := <-secondTimeticker.C:
+		/*case secondTime := <-secondTimeticker.C:
 			{
-				gohipernet.NetLib_SetCurrnetUnixTime(secondTime.Unix())
-			}
+				NetLibSetCurrnetUnixTime(secondTime.Unix())
+			}*/
 		case <-scheduler.onDone:
 			{
 				IsWantedTermination = true

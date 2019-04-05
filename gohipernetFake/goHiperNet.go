@@ -19,12 +19,19 @@ func NetLibStartNetwork(clientConfig *NetworkConfig, networkFunctor SessionNetwo
 
 
 // Send Interface Function
+// 여기에서는 NetLibISendToClient 와 NetLibIPostSendToClient는 같은 동작을 한다.
+// NetLibISendToAllClient 와 NetLibIPostSendToClient도 같다.
+
+// 특정 클라이언트에게 데이터를 보낸다
 var NetLibISendToClient func(int32, uint64, []byte) bool
+// 접속된 모든 클라이언트에게 데이터를 보낸다.
 var NetLibISendToAllClient func([]byte)
+
 var NetLibIPostSendToAllClient func([]byte)
 var NetLibIPostSendToClient func(int32, uint64, []byte) bool
 
-// 지정한 클라이언트를 강제 종료 시킨다
+
+// 클라이언트 접속을 강제로 짜른다.
 func NetLibForceDisconnectClient(sessionIndex int32, sessionUnqiueID uint64) {
-	//_tcpSessionManager.forceDisconnectClient(sessionIndex, sessionUnqiueID)
+	_tcpSessionManager.forceDisconnectClient(sessionIndex, sessionUnqiueID)
 }

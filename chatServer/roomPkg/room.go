@@ -30,12 +30,6 @@ type baseRoom struct {
 	leaveUserNotify func(int64)
 }
 
-func (room *baseRoom) _initialize(index int32, config RoomConfig) {
-	room._number = config.StartRoomNumber + index
-	room._index = index
-	room._config = config
-}
-
 func (room *baseRoom) getIndex() int32 {
 	return room._index
 }
@@ -55,19 +49,25 @@ func (room *baseRoom) generateUserUniqueId() uint64 {
 	return uniqueId
 }
 
+func (room *baseRoom) initialize(index int32, config RoomConfig) {
+	room._initialize(index, config)
+
+	room._initUserPool()
+	room._userSessionUniqueIdMap = make(map[uint64]*roomUser)
+}
+
+func (room *baseRoom) _initialize(index int32, config RoomConfig) {
+	room._number = config.StartRoomNumber + index
+	room._index = index
+	room._config = config
+}
+
 func (room *baseRoom) EnableEnterUser() bool {
 	if room.getCurUserCount() >= room._config.MaxUserCount {
 		return false
 	}
 
 	return true
-}
-
-func (room *baseRoom) initialize(index int32, config RoomConfig) {
-	room._initialize(index, config)
-
-	room._initUserPool()
-	room._userSessionUniqueIdMap = make(map[uint64]*roomUser)
 }
 
 func (room *baseRoom) settingPacketFunction() {
@@ -153,6 +153,7 @@ func (room *baseRoom) getUser(sessionUniqueId uint64) *roomUser {
 	return nil
 }
 
+// 함수 이름 바꾸는 것이 좋을 듯
 func (room *baseRoom) allocAllUserInfo(exceptSessionUniqueId uint64) (userCount int8, dataSize int16, dataBuffer []byte) {
 	for _, user := range room._userSessionUniqueIdMap {
 		if user.netSessionUniqueId == exceptSessionUniqueId {

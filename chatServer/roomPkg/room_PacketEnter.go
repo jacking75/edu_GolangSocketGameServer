@@ -9,7 +9,6 @@ import (
 	"golang_socketGameServer_codelab/chatServer/protocol"
 )
 
-// TODO 방 입장 중에 유저가 연결을 끊을 수 있으므로 이때 문제가 없는지 꼼꼼한 확인 필요
 func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet protocol.Packet) int16 {
 	curTime := NetLib_GetCurrnetUnixTime()
 	sessionIndex := packet.UserSessionIndex

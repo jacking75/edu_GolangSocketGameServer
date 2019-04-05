@@ -36,15 +36,7 @@ func (server *ChatServer) _distributePacket(sessionIndex int32,
 		return;
 	}
 
-
-	roomPacket := _makeRoomDistributePacket(packetID, bodySize, bodyData, sessionIndex, sessionUniqueId, userRoomNum)
-
-
-	startRoomNumber := int32(server.appConfig.RoomStartNum)
-	roomIndex := roomPkg.RoomNumberToIndex(startRoomNumber, userRoomNum)
-	server._roomMgr.PushPacket(roomIndex, roomPacket)
-
-	NTELIB_LOG_DEBUG("_distributePacket - Room", zap.Int32("sessionIndex", sessionIndex), zap.Int32("RoomNumber", userRoomNum), zap.Int32("RoomIndex", roomIndex))
+	server._packetToRoom(packetID, bodySize, bodyData, sessionIndex, sessionUniqueId, userRoomNum)
 }
 
 func (server *ChatServer) ProcessPacket(sessionIndex int32,
@@ -142,13 +134,13 @@ func _rommNumberFromPacketOrSessionInfo(packetID int16,
 	return userRoomNum, protocol.ERROR_CODE_NONE
 }
 
-func _makeRoomDistributePacket(packetID int16,
+func (server *ChatServer) _packetToRoom(packetID int16,
 	bodySize int16,
 	bodyData []byte,
 	sessionIndex int32,
 	sessionUniqueId uint64,
 	userRoomNum int32,
-	) protocol.Packet {
+	) {
 	packet := protocol.Packet{Id: packetID}
 	packet.UserSessionIndex = sessionIndex
 	packet.UserSessionUniqueId = sessionUniqueId
@@ -159,12 +151,15 @@ func _makeRoomDistributePacket(packetID int16,
 	copy(packet.Data, bodyData)
 
 	if packetID == protocol.PACKET_ID_ROOM_ENTER_REQ {
-		// 여기까지 오면 아래 함수는 100% 성공. 아니면 골치 아픈 문제 발생 ;;;;
 		userID, _ := connectedSessions.GetUserID(sessionIndex)
 		userIDLen := connectedSessions.GetUserIDLength(sessionIndex)
 		packet.UserID = make([]byte, userIDLen)
 		copy(packet.UserID, userID)
 	}
 
-	return packet
+	startRoomNumber := int32(server.appConfig.RoomStartNum)
+	roomIndex := roomPkg.RoomNumberToIndex(startRoomNumber, userRoomNum)
+	server._roomMgr.PushPacket(roomIndex, packet)
+
+	NTELIB_LOG_DEBUG("_distributePacket - Room", zap.Int32("sessionIndex", sessionIndex), zap.Int32("RoomNumber", userRoomNum), zap.Int32("RoomIndex", roomIndex))
 }

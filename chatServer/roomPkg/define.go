@@ -18,8 +18,7 @@ type roomUser struct {
 	IDLen int8
 	ID [protocol.MAX_USER_ID_BYTE_LENGTH]byte
 	// >>> 다른 유저에게 알려줘야 하는 정보
-
-	packetDataSize int16
+	packetDataSize int16 // 다른 유저에게 알려줘야 하는 정보 의 크기
 }
 
 func (user *roomUser) init(userID []byte, uniqueId uint64) {
@@ -40,22 +39,6 @@ func (user *roomUser) PacketDataSize() int16 {
 	return int16(1) + int16(user.IDLen) + 8
 }
 
-
-
-type RoomMemberPacket struct {
-	RoomIndex int
-
-	UserID    []byte
-	SessionIndex    int32
-	SessionUniqueId uint64
-}
-
-
-
-type userNetworkInfo struct {
-	sessionIndex    int32
-	sessionUniqueId uint64
-}
 
 type addRoomUserInfo struct {
 	userID []byte

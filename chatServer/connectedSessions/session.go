@@ -17,12 +17,6 @@ type session struct {
 	_connectTimeSec int64 // 연결된 시간
 	_RoomNum        int32 //
 	_RoomNumOfEntering int32 // 현재 입장 중인 룸의 번호
-
-	_RequestCountTimeSec int64 // 요청 수 카운팅 시간 대
-	_RequestCountPerSec  int32 // 초당 요청 수
-
-	_disConnectWaitStartTimeSec int64 // 유저가 연결을 끊기를 대기하기 시작한 시간.
-	_recentlyReceivedTimeSec    int64 // 가장 근래에 패킷을 받은 시간
 }
 
 func (session *session) Init(index int32) {
@@ -38,8 +32,6 @@ func (session *session) Clear() {
 	session._ClearUserId()
 	session.setRoomNumber(0, -1, 0)
 	session.SetConnectTimeSec(0, 0)
-	session.SetRecentlyReceivedTimeSec(0)
-	session.SetDisConnectWaitStartTimeSec(0)
 }
 
 func (session *session) GetIndex() int32 {
@@ -130,37 +122,4 @@ func (session *session) getRoomNumber() (int32, int32) {
 	roomNum := atomic.LoadInt32(&session._RoomNum)
 	roomNumOfEntering := atomic.LoadInt32(&session._RoomNum)
 	return roomNum, roomNumOfEntering
-}
-
-func (session *session) SetRecentlyReceivedTimeSec(timeSec int64) {
-	atomic.StoreInt64(&session._recentlyReceivedTimeSec, timeSec)
-}
-
-func (session *session) GetRecentlyReceivedTimeSec() int64 {
-	return atomic.LoadInt64(&session._recentlyReceivedTimeSec)
-}
-
-func (session *session) SetDisConnectWaitStartTimeSec(timeSec int64) {
-	atomic.StoreInt64(&session._disConnectWaitStartTimeSec, timeSec)
-}
-
-func (session *session) GetDisConnectWaitStartTimeSec() int64 {
-	return atomic.LoadInt64(&session._disConnectWaitStartTimeSec)
-}
-
-func (session *session) IsLogoutRequested() bool {
-	return session.GetDisConnectWaitStartTimeSec() != 0
-}
-
-
-func (session *session) AddRequestPerSecondTime(curTime int64) int32 {
-	// 현재 구조상 절대 이 함수가 동시에 호출 될 수 없음. 만약 동시 호출 된다면 버그!!!
-	if session._RequestCountTimeSec != curTime {
-		session._RequestCountTimeSec = curTime
-		session._RequestCountPerSec = 1
-	} else {
-		session._RequestCountPerSec++
-	}
-
-	return session._RequestCountPerSec
 }

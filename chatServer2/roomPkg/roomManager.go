@@ -46,7 +46,7 @@ func (roomMgr *RoomManager) _initialize(config RoomConfig) {
 	_log_StartRoomPacketProcess(config.MaxRoomCount, config)
 	roomMgr._setRoomPacketPipe(config)
 
-	NTELIB_LOG_INFO("[[[RoomManager initialize - Park]]]", zap.Int32("_maxRoomCount", roomMgr._maxRoomCount))
+	NTELIB_LOG_INFO("[[[RoomManager initialize]]]", zap.Int32("_maxRoomCount", roomMgr._maxRoomCount))
 }
 
 func (roomMgr *RoomManager) _setRoomPacketPipe(config RoomConfig) {

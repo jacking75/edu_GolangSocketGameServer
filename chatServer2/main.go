@@ -12,10 +12,9 @@ import (
 func main() {
 	NetLibInitLog()
 
-	netConfigClient, netConfigServer, appConfig := parseAppConfig()
+	netConfig, appConfig := parseAppConfig()
 	appConfig.writeServerConfig()
-	netConfigClient.WriteNetworkConfig(true)
-	netConfigServer.WriteNetworkConfig(false)
+	netConfig.WriteNetworkConfig(true)
 
 
 	protocol.Init_packet()
@@ -26,12 +25,11 @@ func main() {
 
 
 	// 아래 함수를 호출하면 강제적으로 종료 시킬 때까지 대기 상태가 된다.
-	createServer(netConfigClient, appConfig)
+	createServer(netConfig, appConfig)
 }
 
-func parseAppConfig() (NetworkConfig, NetworkConfig, configAppServer) {
+func parseAppConfig() (NetworkConfig, configAppServer) {
 	client := NetworkConfig{}
-	server := NetworkConfig{}
 	appConfig := configAppServer{}
 
 	flag.BoolVar(&client.IsTcp4Addr,"c_IsTcp4Addr", true, "bool flag")
@@ -59,5 +57,5 @@ func parseAppConfig() (NetworkConfig, NetworkConfig, configAppServer) {
 	flag.IntVar(&appConfig.MaxRequestCountPerSecond,"MaxRequestCountPerSecond", 0, "int flag")
 
 	flag.Parse()
-	return client, server, appConfig
+	return client, appConfig
 }

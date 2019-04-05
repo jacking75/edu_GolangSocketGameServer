@@ -83,7 +83,6 @@ func ProcessPacketLogin(sessionIndex int32,
 	}
 
 	userID := bytes.Trim(request.UserID[:], "\x00");
-	//gohipernet.LOG_DEBUG("PACKET_ID_LOGIN_REQ", zap.String("userID", userID))
 
 	if len(userID) <= 0 {
 		_sendLoginResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_LOGIN_USER_INVALID_ID)

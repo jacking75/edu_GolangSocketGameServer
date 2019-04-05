@@ -1,9 +1,8 @@
 package gohipernetFake
 
 import (
-	"sync/atomic"
-
 	"go.uber.org/zap/zapcore"
+	"time"
 )
 
 
@@ -22,14 +21,9 @@ func wrapLoggerFunc() {
 
 /// <<< Server
 // 유닉스 타임 스탬프 시간
-var _unixTime int64
-
-func NetLib_SetCurrnetUnixTime(timeSec int64) {
-	atomic.StoreInt64(&_unixTime, timeSec)
-}
 
 func NetLib_GetCurrnetUnixTime() int64 {
-	return atomic.LoadInt64(&_unixTime)
+	return time.Now().Unix()
 }
 
 

@@ -1,11 +1,12 @@
 package gohipernetFake
 
 import (
+	"go.uber.org/zap"
 	"sync"
 	"sync/atomic"
 )
 
-// 이 파일에서는 최대한 tcpSessionManager의 멤버를 접근하지 않도록 한다. 그래야 멀티스레드에서 문제가 없음  
+
 type tcpClientSessionManager struct {
 	_networkFunctor SessionNetworkFunctors
 
@@ -19,6 +20,25 @@ func newClientSessionManager(config *NetworkConfig,
 	sessionMgr._networkFunctor = networkFunctor
 	sessionMgr._sessionMap = sync.Map{}
 	return sessionMgr
+}
+
+func (sessionMgr *tcpClientSessionManager) addSession(session* TcpSession) bool {
+	sessionIndex := session.Index
+	sessionUniqueId := session.SeqIndex
+
+	session, resut := sessionMgr._findSession(sessionIndex, sessionUniqueId)
+	if resut  {
+		return false
+	}
+
+	Logger.Info("SessionManager- addSession", zap.Uint64("unique", sessionUniqueId))
+	sessionMgr._sessionMap.Store(sessionUniqueId, session)
+	return true
+}
+
+func (sessionMgr *tcpClientSessionManager) removeSession(sessionUniqueId uint64) {
+	Logger.Info("SessionManager- removeSession", zap.Uint64("unique", sessionUniqueId))
+	sessionMgr._sessionMap.Delete(sessionUniqueId)
 }
 
 func (sessionMgr *tcpClientSessionManager) sendPacket(sessionIndex int32,
@@ -61,6 +81,19 @@ func (sessionMgr *tcpClientSessionManager) _findSession(sessionIndex int32,
 	}
 
 	return nil, false
+}
+
+func (sessionMgr *tcpClientSessionManager) forceDisconnectClient(sessionIndex int32,
+	sessionUniqueId uint64) bool {
+	Logger.Info("forceDisconnectClient")
+
+	session, resut := sessionMgr._findSession(sessionIndex, sessionUniqueId)
+	if resut == false {
+		return false
+	}
+
+	session.closeProcess()
+	return true
 }
 
 func (sessionMgr *tcpClientSessionManager) _forceCloseAllSession() {

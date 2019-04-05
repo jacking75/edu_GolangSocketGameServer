@@ -3,7 +3,6 @@ package connectedSessions
 import (
 	"sync"
 	"sync/atomic"
-	"time"
 
 	"go.uber.org/zap"
 
@@ -55,10 +54,6 @@ func AddSession(sessionIndex int32, sessionUniqueID uint64) bool {
 	// 방어적인 목적으로 한번 더 Clear 한다
 	_manager._sessionList[sessionIndex].Clear()
 
-	var curTime int64 = time.Now().Unix()
-	_manager._sessionList[sessionIndex].SetRecentlyReceivedTimeSec(curTime)
-	_manager._sessionList[sessionIndex].SetConnectTimeSec(curTime, sessionUniqueID)
-
 	return true
 }
 
@@ -78,11 +73,6 @@ func RemoveSession(sessionIndex int32, isLoginedUser bool) bool {
 	_manager._sessionList[sessionIndex].Clear()
 
 	return true
-}
-
-func CurrentLoginUserCount() int32 {
-	count := atomic.LoadInt32(&_manager._currentLoginUserCount)
-	return count
 }
 
 func _validSessionIndex(index int32) bool {
@@ -108,45 +98,6 @@ func GetUserID(sessionIndex int32) ([]byte, bool) {
 	}
 
 	return _manager._sessionList[sessionIndex].getUserID(), true
-}
-
-func GetUserIDLength(sessionIndex int32) int8 {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-		return -1
-	}
-
-	return _manager._sessionList[sessionIndex].getUserIDLength()
-}
-
-func isConnectedSession(sessionIndex int32) bool {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-		return false
-	}
-
-	if _manager._sessionList[sessionIndex].GetConnectTimeSec() == 0 {
-		return false
-	}
-
-	return true
-}
-
-func GetConnectTimeSec(sessionIndex int32) int64 {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-		return 0
-	}
-
-	return _manager._sessionList[sessionIndex].GetConnectTimeSec()
-}
-
-func EnableLogin(sessionIndex int32) bool {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-		return false
-	}
-	return _manager._sessionList[sessionIndex].IsAuth() == false
 }
 
 func SetLogin(sessionIndex int32, sessionUniqueId uint64, userID []byte, curTimeSec int64) bool {
@@ -176,15 +127,6 @@ func IsLoginUser(sessionIndex int32) bool {
 	return _manager._sessionList[sessionIndex].IsAuth()
 }
 
-func SetRoomEntering(sessionIndex int32, roomNum int32) bool {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-		return false
-	}
-
-	return _manager._sessionList[sessionIndex].setRoomEntering(roomNum)
-}
-
 func SetRoomNumber(sessionIndex int32, sessionUniqueId uint64, roomNum int32, curTimeSec int64) bool {
 	if _validSessionIndex(sessionIndex) == false {
 		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
@@ -202,42 +144,4 @@ func GetRoomNumber(sessionIndex int32) (int32, int32) {
 	return _manager._sessionList[sessionIndex].getRoomNumber()
 }
 
-func SetRecentlyReceivedTimeSec(sessionIndex int32, time int64) {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-	}
 
-	_manager._sessionList[sessionIndex].SetRecentlyReceivedTimeSec(time)
-}
-
-func GetRecentlyReceivedTimeSec(sessionIndex int32) int64 {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-		return -1
-	}
-	return _manager._sessionList[sessionIndex].GetRecentlyReceivedTimeSec()
-}
-
-func SetDisConnectWaitStartTimeSec(sessionIndex int32, timeSec int64) {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-	}
-
-	_manager._sessionList[sessionIndex].SetDisConnectWaitStartTimeSec(timeSec)
-}
-
-func GetDisConnectWaitStartTimeSec(sessionIndex int32) int64 {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-	}
-
-	return _manager._sessionList[sessionIndex].GetDisConnectWaitStartTimeSec()
-}
-
-func AddRequestPerSecondTime(sessionIndex int32, curTime int64) int32 {
-	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
-	}
-
-	return _manager._sessionList[sessionIndex].AddRequestPerSecondTime(curTime)
-}

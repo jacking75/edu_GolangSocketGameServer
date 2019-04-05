@@ -56,6 +56,8 @@ func _start_TCPServer_block(config *NetworkConfig, networkFunctor SessionNetwork
 			NetworkFunctor: networkFunctor,
 		}
 
+		_tcpSessionManager.addSession(client)
+
 		go client.handleTcpRead(networkFunctor)
 	}
 

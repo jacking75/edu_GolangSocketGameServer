@@ -84,7 +84,7 @@ loop:
 		// for packet := range packetQueue
 		case packet := <-packetPipe._chanPacket:
 			{
-				packetPipe._parkChannel_PacketProcess(packet)
+				packetPipe._packetProcess(packet)
 			}
 		case internalPacket := <-packetPipe._chanInternalPacket:
 			{
@@ -103,7 +103,7 @@ loop:
 	return IsWantedTermination
 }
 
-func (packetPipe *roomPacketPipe) _parkChannel_PacketProcess(packet protocol.Packet) int16 {
+func (packetPipe *roomPacketPipe) _packetProcess(packet protocol.Packet) int16 {
 	NTELIB_LOG_DEBUG("[[Room - _packetProcess]]", zap.Int16("PacketID", packet.Id))
 
 	room := packetPipe.getRoomByRoomNum(packet.RoomNumber)

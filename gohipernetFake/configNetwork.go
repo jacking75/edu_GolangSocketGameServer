@@ -7,10 +7,10 @@ import (
 
 type NetworkConfig struct {
 	IsTcp4Addr                    bool
-	BindAddress                   string // 만약 IP와 포트번호 결합이면 localhost:19999
+	BindAddress                   string // 예) localhost:19999
 	MaxSessionCount               int // 최대 클라이언트 세션 수. 넉넉하게 많이 해도 괜찮다
 	MaxPacketSize                 int // 최대 패킷 크기
-	MaxReceiveBufferSize          int // 사이드 받기 버퍼 크기. 최소 ClientMaxPacketSize 2배 이상 추천.
+	MaxReceiveBufferSize          int // 받기 버퍼 크기. 최소 MaxPacketSize 2배 이상 추천.
 
 }
 

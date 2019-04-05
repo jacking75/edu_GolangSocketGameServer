@@ -1,21 +1,21 @@
 package gohipernetFake
 
 import (
+	"go.uber.org/zap"
 	"net"
 )
 
 
 
-// TcpSession holds info about connection
 type TcpSession struct {
-	SessionIndex int32
-	SeqIndex uint64
-	conn   net.Conn
+	Index          int32
+	SeqIndex       uint64
+	conn           net.Conn
 	NetworkFunctor SessionNetworkFunctors
 }
 
 func (session *TcpSession) handleTcpRead(networkFunctor SessionNetworkFunctors) {
-	session.NetworkFunctor.OnConnect(session.SessionIndex, session.SeqIndex)
+	session.NetworkFunctor.OnConnect(session.Index, session.SeqIndex)
 
 
 	var startRecvPos int16
@@ -48,7 +48,7 @@ func (session *TcpSession) handleTcpRead(networkFunctor SessionNetworkFunctors) 
 }
 
 func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (int16, int) {
-	sessionIndex := session.SessionIndex
+	sessionIndex := session.Index
 	sessionUnique := session.SeqIndex
 
 	var startRecvPos int16 = 0
@@ -87,8 +87,12 @@ func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (i
 }
 
 func (session *TcpSession) closeProcess() {
+	Logger.Info("closeProcess", zap.Int32("sessionIndex", session.Index), zap.Uint64("SeqIndex", session.SeqIndex))
+
 	session.conn.Close()
-	session.NetworkFunctor.OnClose(session.SessionIndex, session.SeqIndex)
+	session.NetworkFunctor.OnClose(session.Index, session.SeqIndex)
+
+	_tcpSessionManager.removeSession(session.SeqIndex)
 }
 
 // Send bytes to client
