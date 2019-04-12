@@ -38,6 +38,10 @@
 - 패킷 요청 처리를 1개의 고루틴(스레드)에서만 한다.
 - echoServer에 비해 규모는 3~4배 크다.
   
+### 추가 기능 구현
+- 1:1 귓속말
+- 방 초대
+    
   
 ## chatServer2
 - 디렉토리: chatServer2
@@ -45,11 +49,22 @@
 - 패킷 요청 처리를 N개의 고루틴(스레드)에서 한다.
     - 패킷 처리를 멀티 고루틴에서 하므로 공유 객체 동기화를 조심해야 한다.
 - chatServer의 코드와 겹치는 부분이 많으므로 chatServer에 대한 이해가 꼭 필요하다
-  
-  
+    
+### 추가 기능 구현
+- Redis 연동
+- API Server(http)와 연동  
+    - 로그인을 API Server에서 한다.  
+    
+	
 ## baccaratServer 
 - 디렉토리: baccaratServer
     - 2019.04.05 아직 구현하지는 않았다. 위 단계 실습 후 결정할 예정
 - 겜블 게임인 바카라 게임을 온라인화 한 것이다.
     - 바카라 룰: https://namu.wiki/w/%EB%B0%94%EC%B9%B4%EB%9D%BC
 - chatServer2에 바카라 게임 로직이 올라간 것으로 chatServer2에 대한 이해가 꼭 필요하다.
+  
+### 추가 기능 구현
+- 게임 서버 Scale-Out 기능 구현
+-  API Server(http)와 연동  
+    - 유저를 특정 게임 서버에 할당하는 기능
+    - 매칭 기능	
