@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	_ "github.com/k0kubun/pp"
-	_ "go.uber.org/zap"
 	. "golang_socketGameServer_codelab/gohipernetFake"
 )
 
