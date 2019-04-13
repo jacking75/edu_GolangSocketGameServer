@@ -68,3 +68,8 @@
 -  API Server(http)와 연동  
     - 유저를 특정 게임 서버에 할당하는 기능
     - 매칭 기능	
+  
+    
+## TCP 내트워크 프로그래밍과 GoHiperNet 
+- 이 [저장소](https://github.com/jacking75/golang_network_socket_study)에 있는 코드와 글을 기반으로 소켓 프로그래밍 방법을 배운다.
+  
