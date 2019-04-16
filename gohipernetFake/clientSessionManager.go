@@ -44,8 +44,8 @@ func (sessionMgr *tcpClientSessionManager) removeSession(sessionUniqueId uint64)
 func (sessionMgr *tcpClientSessionManager) sendPacket(sessionIndex int32,
 			sessionUniqueId uint64,
 			sendData []byte) bool {
-	session, resut := sessionMgr._findSession(sessionIndex, sessionUniqueId)
-	if resut == false {
+	session, result := sessionMgr._findSession(sessionIndex, sessionUniqueId)
+	if result == false {
 		return false
 	}
 
