@@ -51,8 +51,8 @@ func _start_TCPServer_block(config *NetworkConfig, networkFunctor SessionNetwork
 	for {
 		conn, _ := _mClientListener.Accept()
 		client := &TcpSession{
-			SeqIndex: SeqNumIncrement(),
-			conn:   conn,
+			SeqIndex:       SeqNumIncrement(),
+			TcpConn:        conn,
 			NetworkFunctor: networkFunctor,
 		}
 

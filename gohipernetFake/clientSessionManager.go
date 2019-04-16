@@ -26,7 +26,7 @@ func (sessionMgr *tcpClientSessionManager) addSession(session* TcpSession) bool 
 	sessionIndex := session.Index
 	sessionUniqueId := session.SeqIndex
 
-	session, resut := sessionMgr._findSession(sessionIndex, sessionUniqueId)
+	_, resut := sessionMgr._findSession(sessionIndex, sessionUniqueId)
 	if resut  {
 		return false
 	}

@@ -12,6 +12,7 @@ namespace csharp_test_client
 
         void SetPacketHandler()
         {
+            PacketFuncDic.Add(PACKET_ID.PACKET_ID_ECHO, PacketProcess_Echo);
             PacketFuncDic.Add(PACKET_ID.PACKET_ID_ERROR_NTF, PacketProcess_ErrorNotify);
             PacketFuncDic.Add(PACKET_ID.PACKET_ID_LOGIN_RES, PacketProcess_LoginResponse);
             PacketFuncDic.Add(PACKET_ID.PACKET_ID_ROOM_ENTER_RES, PacketProcess_RoomEnterResponse);
@@ -38,6 +39,11 @@ namespace csharp_test_client
             {
                 DevLog.Write("Unknown Packet Id: " + packet.PacketID.ToString());
             }         
+        }
+
+        void PacketProcess_Echo(byte[] bodyData)
+        {
+            DevLog.Write($"Echo 받음:  {bodyData.Length}");
         }
 
         void PacketProcess_ErrorNotify(byte[] bodyData)

@@ -15,6 +15,8 @@ namespace csharp_test_client
 
     public enum PACKET_ID : ushort
     {
+        PACKET_ID_ECHO = 101,
+
         // Ping(Heart-beat)
         PACKET_ID_PING_REQ = 201,
         PACKET_ID_PING_RES = 202,

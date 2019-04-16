@@ -100,11 +100,12 @@ namespace csharp_test_client
                 MessageBox.Show("보낼 텍스트를 입력하세요");
                 return;
             }
-                        
-            List<byte> dataSource = new List<byte>();
-            dataSource.AddRange(Encoding.UTF8.GetBytes(textSendText.Text));
 
-            SendPacketQueue.Enqueue(dataSource.ToArray());
+            var body = Encoding.UTF8.GetBytes(textSendText.Text);
+
+            PostSendPacket(PACKET_ID.PACKET_ID_ECHO, body);
+
+            DevLog.Write($"Echo 요청:  {textSendText.Text}, {body.Length}");
         }
 
 

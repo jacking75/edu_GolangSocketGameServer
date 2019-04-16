@@ -10,7 +10,7 @@ import (
 type TcpSession struct {
 	Index          int32
 	SeqIndex       uint64
-	conn           net.Conn
+	TcpConn        net.Conn
 	NetworkFunctor SessionNetworkFunctors
 }
 
@@ -23,7 +23,7 @@ func (session *TcpSession) handleTcpRead(networkFunctor SessionNetworkFunctors) 
 	recviveBuff := make([]byte, MAX_RECEIVE_BUFFER_SIZE)
 
 	for {
-		recvBytes, err := session.conn.Read(recviveBuff[startRecvPos:])
+		recvBytes, err := session.TcpConn.Read(recviveBuff[startRecvPos:])
 		if err != nil {
 			//TODO 끊는 이유 남기기
 			session.closeProcess()
@@ -89,7 +89,7 @@ func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (i
 func (session *TcpSession) closeProcess() {
 	Logger.Info("closeProcess", zap.Int32("sessionIndex", session.Index), zap.Uint64("SeqIndex", session.SeqIndex))
 
-	session.conn.Close()
+	session.TcpConn.Close()
 	session.NetworkFunctor.OnClose(session.Index, session.SeqIndex)
 
 	_tcpSessionManager.removeSession(session.SeqIndex)
@@ -97,10 +97,10 @@ func (session *TcpSession) closeProcess() {
 
 // Send bytes to client
 func (session *TcpSession) sendPacket(b []byte) error {
-	_, err := session.conn.Write(b)
+	_, err := session.TcpConn.Write(b)
 	return err
 }
 
 func (session *TcpSession) close() error {
-	return session.conn.Close()
+	return session.TcpConn.Close()
 }
