@@ -42,6 +42,8 @@ func (packetPipe *roomPacketPipe) getRoomCount() int {
 }
 
 func (packetPipe *roomPacketPipe) getRoomByRoomNum(roomNum int32) *baseRoom {
+	// TODO 관리하는 룸 수가 작다는 가정하에 전체 검사. 작다는 기준은 64 이하
+	// roomNum으로 roomIndex를 찾으면 한번에 룸 객체 위치에 접근 할 수 있다.
 	for i := 0; i < packetPipe._roomCount; i++ {
 		if packetPipe._roomRefList[i].getNumber() == roomNum {
 			return packetPipe._roomRefList[i]

@@ -54,6 +54,7 @@ func AddSession(sessionIndex int32, sessionUniqueID uint64) bool {
 	// 방어적인 목적으로 한번 더 Clear 한다
 	_manager._sessionList[sessionIndex].Clear()
 
+	_manager._sessionList[sessionIndex].SetConnectTimeSec(NetLib_GetCurrnetUnixTime(), sessionUniqueID)
 	return true
 }
 

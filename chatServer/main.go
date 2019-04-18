@@ -20,6 +20,7 @@ func main() {
 func parseAppConfig() (NetworkConfig, configAppServer) {
 	NTELIB_LOG_INFO("[[Setting NetworkConfig]]")
 
+	//TODO flag 사용하기
 	appConfig := configAppServer {
 		"chatServer",
 		1000,

@@ -40,8 +40,9 @@ func createServer(netConfig NetworkConfig, appConfig configAppServer) {
 		return
 	}
 
+	protocol.Init_packet();
+	
 	server.init(int32(netConfig.MaxSessionCount), appConfig)
-
 
 	networkFunctor := SessionNetworkFunctors{}
 	networkFunctor.OnConnect = server.OnConnect

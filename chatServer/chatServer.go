@@ -42,6 +42,8 @@ func createAnsStartServer(netConfig NetworkConfig, appConfig configAppServer) {
 		return
 	}
 
+	protocol.Init_packet();
+
 	maxUserCount := appConfig.RoomMaxCount * appConfig.RoomMaxUserCount
 	connectedSessions.Init(netConfig.MaxSessionCount, maxUserCount)
 
@@ -120,6 +122,7 @@ func (server *ChatServer) OnClose(sessionIndex int32, sessionUniqueID uint64) {
 
 func (server *ChatServer) disConnectClient(sessionIndex int32, sessionUniqueId uint64) {
 	// 로그인도 안한 유저라면 그냥 여기서 처리한다.
+	// 방 입장을 안한 유저라면 여기서 처리해도 괜찮지만 아래로 넘긴다.
 	if connectedSessions.IsLoginUser(sessionIndex) == false {
 		NTELIB_LOG_INFO("DisConnectClient - Not Login User", zap.Int32("sessionIndex", sessionIndex))
 		connectedSessions.RemoveSession(sessionIndex, false)
