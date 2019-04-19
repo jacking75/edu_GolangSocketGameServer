@@ -1,15 +1,22 @@
 package roomPkg
 
-import "math/rand"
+import (
+	"math/rand"
+	"time"
+
+	. "golang_socketGameServer_codelab/gohipernetFake"
+)
 
 type baccaratGame struct {
 	_statusChangeCompletionMillSec int64 // 다음 상태로 바뀔 때까지의 시간. 0 이면 사용하지 않음.
-
+	_rand *rand.Rand
 	_dillerCardPos int
 	_cards []int8
 }
 
 func (game *baccaratGame) init() {
+	game._rand = rand.New(rand.NewSource(1))
+	game._rand.Seed(time.Now().UTC().UnixNano()) // 다른 방의 시드 값과 같을 듯. 무작위 난수값이 들어가는 것이 좋음
 	game._cards = makeCard()
 	game.clear()
 }
@@ -20,7 +27,11 @@ func (game *baccaratGame) clear() {
 	game._cardChuffle()
 }
 
-func (game *baccaratGame) doBatting(curMilliSec int64) {
+func (game *baccaratGame) isTimeOver(curTimeMilliSec int64) bool {
+	return game._statusChangeCompletionMillSec != 0 && game._statusChangeCompletionMillSec <= curTimeMilliSec
+}
+
+func (game *baccaratGame) setBattingWaitTime(curMilliSec int64) {
 	game._statusChangeCompletionMillSec = curMilliSec + BATTING_WAIT_MILLISEC
 }
 
@@ -76,6 +87,8 @@ func (game *baccaratGame) doBaccarat() baccaratGameResultInfo {
 	}
 
 	_End(&gameResult)
+
+	game._statusChangeCompletionMillSec = NetLib_GetCurrnetUnixTime() + NEXT_GAME_WAIT_MILLISEC
 	return gameResult
 }
 
@@ -95,7 +108,7 @@ func (game *baccaratGame)_cardChuffle() {
 	// https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 
 	for i := MAX_CARD_CONT - 1; i >= 0; i-- {
-		j := rand.Intn(i + 1)
+		j := game._rand.Intn(i + 1)
 		game._cards[i], game._cards[j] = game._cards[j], game._cards[i]
 	}
 }

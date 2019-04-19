@@ -24,7 +24,7 @@ func (user *roomUser) init(userID []byte, uniqueId uint64) {
 
 	user.RoomUniqueId = uniqueId
 
-	user.selectBat = BATTING_TYPE_NONE
+	user.selectBat = BATTING_SELECT_NONE
 }
 
 func (user *roomUser) SetNetworkInfo(sessionIndex int32, sessionUniqueId uint64) {

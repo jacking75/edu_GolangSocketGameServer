@@ -58,7 +58,7 @@ func (roomMgr *RoomManager) getRoomByNumber(roomNumber int32) *baseRoom {
 }
 
 //  이 함수를 호출할 때의 채널 인덱스는 꼭 호출자가 유효범위인 것을 보증해야 한다.
-func (roomMgr *RoomManager) _getRoomUserCount(roomId int32) int32 {
+func (roomMgr *RoomManager) _getRoomUserCount(roomId int32) int {
 	return roomMgr._roomList[roomId].getCurUserCount()
 }
 
@@ -95,8 +95,17 @@ func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Pack
 		return
 	}
 
-	NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail(Not Registered)]]", 								zap.Int16("PacketID", packet.Id))
+	NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail(Not Registered)]]", zap.Int16("PacketID", packet.Id))
 }
+
+func (roomMgr *RoomManager) CheckRoomState(curTimeMilliSec int64) {
+	//TODO 한번에 모든 방을 다 조사할 필요가 없다. 밀리세컨드 단위로 타이머를 돌게 하고 그룹 단위로 방을 조사한다
+
+	for i := 0; i < (int)(roomMgr._maxRoomCount); i++ {
+		roomMgr._roomList[i].checkState(curTimeMilliSec)
+	}
+}
+
 
 
 func _log_StartRoomPacketProcess(maxRoomCount int32, config RoomConfig) {

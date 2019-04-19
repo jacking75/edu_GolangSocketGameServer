@@ -2,11 +2,9 @@ package roomPkg
 
 import (
 	"sync"
-	"sync/atomic"
-
-	. "golang_socketGameServer_codelab/gohipernetFake"
 
 	"golang_socketGameServer_codelab/baccaratServer/protocol"
+	. "golang_socketGameServer_codelab/gohipernetFake"
 )
 
 type baseRoom struct {
@@ -17,8 +15,6 @@ type baseRoom struct {
 	_curState int
 
 	_gameLogic baccaratGame
-
-	_curUserCount int32
 
 	_roomUserUnqieuIdSeq uint64
 
@@ -45,29 +41,30 @@ func (room *baseRoom) getNumber() int32 {
 }
 
 
-func (room *baseRoom) IsStateNone() bool {
+func (room *baseRoom) isStateNone() bool {
 	return room._curState == ROOM_STATE_NOE
 }
 
-func (room *baseRoom) IsStateGame() bool {
-	return room._curState != ROOM_STATE_NOE
+func (room *baseRoom) isStateGameResult() bool {
+	return room._curState == ROOM_STATE_GAME_RESULT
 }
 
-func (room *baseRoom) IsStateGameBattingWait() bool {
+func (room *baseRoom) isStateGameBattingWait() bool {
 	return room._curState == ROOM_STATE_GAME_WAIT_BATTING
 }
 
-func (room *baseRoom) getCurUserCount() int32 {
-	count := atomic.LoadInt32(&room._curUserCount)
+func (room *baseRoom) getCurUserCount() int {
+	count := len(room._userSessionUniqueIdMap)
 	return count
 }
 
 func (room *baseRoom) changeState(state int) {
 	room._curState = state
 
-	if room._curState == ROOM_STATE_GAME_WAIT_BATTING {
+	if room._curState == ROOM_STATE_NOE {
 		room._gameLogic.clear()
-		room._gameLogic.doBatting(NetLib_GetCurrnetUnixTime())
+	} else if room._curState == ROOM_STATE_GAME_WAIT_BATTING {
+		room._gameLogic.setBattingWaitTime(NetLib_GetCurrnetUnixTime())
 	}
 }
 
@@ -81,7 +78,7 @@ func (room *baseRoom) getMasterUser(userSessionUniqueId uint64) *roomUser {
 }
 
 func (room *baseRoom) _settingMasterUser() {
-	if room._curUserCount < 1 {
+	if room.getCurUserCount() < 1 {
 		room._masterUserSessionUniqueId = 0
 	}
 
@@ -123,7 +120,7 @@ func (room *baseRoom) _initialize(index int32, config RoomConfig) {
 }
 
 func (room *baseRoom) EnableEnterUser() bool {
-	if room.getCurUserCount() >= room._config.MaxUserCount {
+	if room._IsFullUser() {
 		return false
 	}
 
@@ -178,8 +175,6 @@ func (room *baseRoom) addUser(userInfo addRoomUserInfo) (*roomUser, int16) {
 	}
 
 
-	atomic.AddInt32(&room._curUserCount, 1)
-
 	user := room._getUserObject()
 	user.init(userInfo.userID, room.generateUserUniqueId())
 	user.SetNetworkInfo(userInfo.netSessionIndex, userInfo.netSessionUniqueId)
@@ -187,7 +182,7 @@ func (room *baseRoom) addUser(userInfo addRoomUserInfo) (*roomUser, int16) {
 
 	room._userSessionUniqueIdMap[user.netSessionUniqueId] = user
 
-	if room._curUserCount == 1 {
+	if room.getCurUserCount() == 1 {
 		room._masterUserSessionUniqueId = userInfo.netSessionUniqueId
 	}
 
@@ -195,7 +190,7 @@ func (room *baseRoom) addUser(userInfo addRoomUserInfo) (*roomUser, int16) {
 }
 
 func (room *baseRoom) _IsFullUser() bool {
-	if room.getCurUserCount() == room._config.MaxUserCount {
+	if room.getCurUserCount() == (int)(room._config.MaxUserCount) {
 		return true
 	}
 
@@ -208,9 +203,7 @@ func (room *baseRoom) _removeUser(user *roomUser) {
 }
 
 func (room *baseRoom) _removeUserObject(user *roomUser) {
-	atomic.AddInt32(&room._curUserCount, -1)
 	room._putUserObject(user)
-
 	room._settingMasterUser()
 }
 
@@ -298,3 +291,47 @@ func (room *baseRoom) disConnectedUser(sessionUniqueId uint64) int16 {
 
 	return protocol.ERROR_CODE_NONE
 }
+
+func (room *baseRoom) isAllUserBatting() bool {
+	count := 0
+	for _, user := range room._userSessionUniqueIdMap {
+		if user.selectBat != BATTING_SELECT_NONE {
+			count++
+		}
+	}
+
+	return count == len(room._userSessionUniqueIdMap)
+}
+
+func (room *baseRoom) endGame() {
+	gameResult := room._gameLogic.doBaccarat()
+
+	notify := protocol.RoomGameResultNtfPacket{}
+	copy(notify.CardsBanker[:], gameResult.cardsBanker[:])
+	copy(notify.CardsPlayer[:], gameResult.cardsPlayer[:])
+	notify.PlayerScore = gameResult.playerScore
+	notify.BankerScore = gameResult.bankerScore
+	notify.Result = gameResult.result
+
+	notifySendBuf, packetSize := notify.EncodingPacket()
+	room.broadcastPacket(packetSize, notifySendBuf, 0)
+
+	room.changeState(ROOM_STATE_GAME_RESULT)
+}
+
+func (room *baseRoom) checkState(curTimeMilliSec int64) {
+	if room.isStateNone() {
+		return
+	} else if room.isStateGameBattingWait() {
+		if room._gameLogic.isTimeOver(curTimeMilliSec) {
+			room.endGame()
+		}
+	} else if room.isStateGameResult() {
+		if room._gameLogic.isTimeOver(curTimeMilliSec) {
+			room.changeState(ROOM_STATE_NOE)
+		}
+	}
+
+
+}
+

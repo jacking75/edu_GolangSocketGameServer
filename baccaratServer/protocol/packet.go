@@ -452,3 +452,120 @@ func NotifyErrorPacket(sessionIndex int32, sessionUniqueId uint64, errorCode int
 	sendBuf, _ := response.EncodingPacket(errorCode)
 	NetLibIPostSendToClient(sessionIndex, sessionUniqueId, sendBuf)
 }
+
+
+
+/// [ 게임 시작 요청 ]]
+type RoomGameStartReqPacket struct {
+}
+
+
+type RoomGameStartResPacket struct {
+	Result int16
+}
+
+func (response RoomGameStartResPacket) EncodingPacket() ([]byte, int16) {
+	totalSize := _clientSessionHeaderSize + 2
+	sendBuf := make([]byte, totalSize)
+
+	writer := MakeWriter(sendBuf, true)
+	EncodingPacketHeader(&writer, totalSize, PACKET_ID_GAME_START_RES, 0)
+	return sendBuf, totalSize
+}
+
+func (response *RoomGameStartResPacket) Decoding(bodyData []byte) bool {
+	reader := MakeReader(bodyData, true)
+	response.Result, _ = reader.ReadS16()
+	return true
+}
+
+
+type RoomGameStartNtfPacket struct {
+}
+
+func (response RoomGameStartNtfPacket) EncodingPacket() ([]byte, int16) {
+	totalSize := _clientSessionHeaderSize
+	sendBuf := make([]byte, totalSize)
+
+	writer := MakeWriter(sendBuf, true)
+	EncodingPacketHeader(&writer, totalSize, PACKET_ID_GAME_START_NTF, 0)
+	return sendBuf, totalSize
+}
+
+
+
+/// [ 게임 배팅 ]]
+type RoomGameBattingReqPacket struct {
+	SelectSide int8
+}
+
+func (request *RoomGameBattingReqPacket) Decoding(bodyData []byte) bool {
+	bodyLength := len(bodyData)
+	if bodyLength < 1 {
+		return false
+	}
+
+	reader := MakeReader(bodyData, true)
+	request.SelectSide, _ = reader.ReadS8()
+	return true
+}
+
+
+type RoomGameBattingResPacket struct {
+	Result int16
+}
+
+func (response RoomGameBattingResPacket) EncodingPacket() ([]byte, int16) {
+	totalSize := _clientSessionHeaderSize + 2
+	sendBuf := make([]byte, totalSize)
+
+	writer := MakeWriter(sendBuf, true)
+	EncodingPacketHeader(&writer, totalSize, PACKET_ID_GAME_BATTING_RES, 0)
+	return sendBuf, totalSize
+}
+
+
+type RoomGameBattingNtfPacket struct {
+	RoomUserUniqueId uint64
+	SelectSide int8
+}
+
+func (response RoomGameBattingNtfPacket) EncodingPacket() ([]byte, int16) {
+	totalSize := _clientSessionHeaderSize + 8 + 1
+	sendBuf := make([]byte, totalSize)
+	writer := MakeWriter(sendBuf, true)
+	EncodingPacketHeader(&writer, totalSize, PACKET_ID_GAME_BATTING_NTF, 0)
+
+	writer.WriteU64(response.RoomUserUniqueId)
+	writer.WriteS8(response.SelectSide)
+	return sendBuf, totalSize
+}
+
+
+
+///[게임 결과 통보]
+type RoomGameResultNtfPacket struct {
+	CardsBanker [3]int8
+	CardsPlayer [3]int8
+	PlayerScore int8
+	BankerScore int8
+	Result      int8
+}
+
+func (notify RoomGameResultNtfPacket) EncodingPacket() ([]byte, int16) {
+	totalSize := _clientSessionHeaderSize + 6 + 2 + 1
+	sendBuf := make([]byte, totalSize)
+	writer := MakeWriter(sendBuf, true)
+	EncodingPacketHeader(&writer, totalSize, PACKET_ID_GAME_RESULT_NTF, 0)
+
+	writer.WriteS8(notify.CardsBanker[0])
+	writer.WriteS8(notify.CardsBanker[1])
+	writer.WriteS8(notify.CardsBanker[2])
+	writer.WriteS8(notify.CardsPlayer[0])
+	writer.WriteS8(notify.CardsPlayer[1])
+	writer.WriteS8(notify.CardsPlayer[2])
+	writer.WriteS8(notify.PlayerScore)
+	writer.WriteS8(notify.BankerScore)
+	writer.WriteS8(notify.Result)
+	return sendBuf, totalSize
+}

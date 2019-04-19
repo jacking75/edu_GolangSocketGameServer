@@ -73,12 +73,9 @@ func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
 					server.RoomMgr.PacketProcess(roomNumber, packet)
 				}
 			}
-		case _ = <-secondTimeticker.C:
+		case curTime := <-secondTimeticker.C:
 			{
-				//TODO 한번에 모든 방을 다 조사할 필요가 없다. 밀리세컨드 단위로 타이머를 돌게 하고 그룹 단위로 방을 조사한다
-
-				//TODO 배팅 대기 중이면 시간 지났는지 체크. 지났으면 카드 배분
-				//TODO 게임 종료이면 대기 시간 지났는지 체크. 지났으면 방 상태를 NONE
+				server.RoomMgr.CheckRoomState(curTime.Unix())
 			}
 		}
 	}
