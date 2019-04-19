@@ -14,6 +14,10 @@ type baseRoom struct {
 	_number int32 // 채널 고유 번호
 	_config RoomConfig
 
+	_curState int
+
+	_gameLogic baccaratGame
+
 	_curUserCount int32
 
 	_roomUserUnqieuIdSeq uint64
@@ -22,6 +26,8 @@ type baseRoom struct {
 
 	//자료구조를 배열로 바꾸는 것이 좋음
 	_userSessionUniqueIdMap map[uint64]*roomUser //range 순회 시 복사 비용이 발생해서 포인터 값을 사용한다.
+
+	_masterUserSessionUniqueId uint64 // 방장의 네트워크 유니크ID
 
 	_funcPackeIdlist []int16
 	_funclist []func(*roomUser, protocol.Packet) int16
@@ -38,10 +44,60 @@ func (room *baseRoom) getNumber() int32 {
 	return room._number
 }
 
+
+func (room *baseRoom) IsStateNone() bool {
+	return room._curState == ROOM_STATE_NOE
+}
+
+func (room *baseRoom) IsStateGame() bool {
+	return room._curState != ROOM_STATE_NOE
+}
+
+func (room *baseRoom) IsStateGameBattingWait() bool {
+	return room._curState == ROOM_STATE_GAME_WAIT_BATTING
+}
+
 func (room *baseRoom) getCurUserCount() int32 {
 	count := atomic.LoadInt32(&room._curUserCount)
 	return count
 }
+
+func (room *baseRoom) changeState(state int) {
+	room._curState = state
+
+	if room._curState == ROOM_STATE_GAME_WAIT_BATTING {
+		room._gameLogic.clear()
+		room._gameLogic.doBatting(NetLib_GetCurrnetUnixTime())
+	}
+}
+
+
+func (room *baseRoom) getMasterSessionUniqueId() uint64 {
+	return room._masterUserSessionUniqueId
+}
+
+func (room *baseRoom) getMasterUser(userSessionUniqueId uint64) *roomUser {
+	return room.getUser(userSessionUniqueId)
+}
+
+func (room *baseRoom) _settingMasterUser() {
+	if room._curUserCount < 1 {
+		room._masterUserSessionUniqueId = 0
+	}
+
+	count := (uint64)(0)
+	masterUniqueId := (uint64)(0)
+
+	for _, user := range room._userSessionUniqueIdMap {
+		if user.RoomUniqueId > count {
+			count = user.RoomUniqueId
+			masterUniqueId = user.netSessionUniqueId
+		}
+	}
+
+	room._masterUserSessionUniqueId = masterUniqueId
+}
+
 
 func (room *baseRoom) generateUserUniqueId() uint64 {
 	room._roomUserUnqieuIdSeq++
@@ -54,12 +110,16 @@ func (room *baseRoom) initialize(index int32, config RoomConfig) {
 
 	room._initUserPool()
 	room._userSessionUniqueIdMap = make(map[uint64]*roomUser)
+
+	room._gameLogic.clear()
 }
 
 func (room *baseRoom) _initialize(index int32, config RoomConfig) {
 	room._number = config.StartRoomNumber + index
 	room._index = index
 	room._config = config
+	room._curState = ROOM_STATE_NOE
+	room._masterUserSessionUniqueId = 0
 }
 
 func (room *baseRoom) EnableEnterUser() bool {
@@ -79,6 +139,8 @@ func (room *baseRoom) settingPacketFunction() {
 	room._addPacketFunction(protocol.PACKET_ID_ROOM_LEAVE_REQ, room._packetProcess_LeaveUser)
 	room._addPacketFunction(protocol.PACKET_ID_ROOM_CHAT_REQ, room._packetProcess_Chat)
 	room._addPacketFunction(protocol.PACKET_ID_ROOM_RELAY_REQ, room._packetProcess_Relay)
+	room._addPacketFunction(protocol.PACKET_ID_GAME_START_REQ, room._packetProcess_GameStart)
+	room._addPacketFunction(protocol.PACKET_ID_GAME_BATTING_REQ, room._packetProcess_GameBatting)
 }
 
 func (room *baseRoom) _addPacketFunction(packetID int16,
@@ -115,6 +177,7 @@ func (room *baseRoom) addUser(userInfo addRoomUserInfo) (*roomUser, int16) {
 		return nil, protocol.ERROR_CODE_ENTER_ROOM_DUPLCATION_USER
 	}
 
+
 	atomic.AddInt32(&room._curUserCount, 1)
 
 	user := room._getUserObject()
@@ -123,6 +186,11 @@ func (room *baseRoom) addUser(userInfo addRoomUserInfo) (*roomUser, int16) {
 	user.packetDataSize = user.PacketDataSize()
 
 	room._userSessionUniqueIdMap[user.netSessionUniqueId] = user
+
+	if room._curUserCount == 1 {
+		room._masterUserSessionUniqueId = userInfo.netSessionUniqueId
+	}
+
 	return user, protocol.ERROR_CODE_NONE
 }
 
@@ -136,13 +204,14 @@ func (room *baseRoom) _IsFullUser() bool {
 
 func (room *baseRoom) _removeUser(user *roomUser) {
 	delete(room._userSessionUniqueIdMap, user.netSessionUniqueId)
-
 	room._removeUserObject(user)
 }
 
 func (room *baseRoom) _removeUserObject(user *roomUser) {
 	atomic.AddInt32(&room._curUserCount, -1)
 	room._putUserObject(user)
+
+	room._settingMasterUser()
 }
 
 func (room *baseRoom) getUser(sessionUniqueId uint64) *roomUser {

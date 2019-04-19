@@ -18,6 +18,7 @@ func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet pro
 	var requestPacket protocol.RoomEnterReqPacket
 	(&requestPacket).Decoding(packet.Data)
 
+	//TODO 방의 상태가 NONE이 아니면 들어올 수 없다.
 
 	userID, ok := connectedSessions.GetUserID(sessionIndex)
 	if ok == false {

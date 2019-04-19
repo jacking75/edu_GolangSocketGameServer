@@ -1,42 +1,9 @@
 package roomPkg
 
-import "golang_socketGameServer_codelab/baccaratServer/protocol"
-
 type RoomConfig struct {
 	StartRoomNumber int32
 	MaxRoomCount int32
 	MaxUserCount int32
-}
-
-
-type roomUser struct {
-	netSessionIndex     int32
-	netSessionUniqueId  uint64
-
-	// <<< 다른 유저에게 알려줘야 하는 정보
-	RoomUniqueId uint64
-	IDLen int8
-	ID [protocol.MAX_USER_ID_BYTE_LENGTH]byte
-	// >>> 다른 유저에게 알려줘야 하는 정보
-	packetDataSize int16 // 다른 유저에게 알려줘야 하는 정보 의 크기
-}
-
-func (user *roomUser) init(userID []byte, uniqueId uint64) {
-	idlen := len(userID)
-
-	user.IDLen = int8(idlen)
-	copy(user.ID[:], userID)
-
-	user.RoomUniqueId = uniqueId
-}
-
-func (user *roomUser) SetNetworkInfo(sessionIndex int32, sessionUniqueId uint64) {
-	user.netSessionIndex = sessionIndex
-	user.netSessionUniqueId = sessionUniqueId
-}
-
-func (user *roomUser) PacketDataSize() int16 {
-	return int16(1) + int16(user.IDLen) + 8
 }
 
 
@@ -46,3 +13,48 @@ type addRoomUserInfo struct {
 	netSessionIndex     int32
 	netSessionUniqueId  uint64
 }
+
+// 방의 상태
+const (
+	ROOM_STATE_NOE = 1
+	ROOM_STATE_GAME_WAIT_BATTING = 2
+	ROOM_STATE_GAME_RESULT = 3
+)
+
+// 카드 정보
+const MAX_CARD_CONT = 52
+const CARD_ROW_COUNT = 13
+// 카드 순서 스페이드, 다이아몬드, 클로버, 하트 A,2,3,4,5,6,7,8,9,10,J,Q,K
+func makeCard() []int8 {
+	a := make([]int8, MAX_CARD_CONT)
+	for i := range a {
+		a[i] = (int8)(i)
+	}
+	return a
+}
+
+const BATTING_WAIT_MILLISEC = 5
+
+const (
+	BATTING_TYPE_NONE = 0
+	BATTING_TYPE_PLAYER = 1
+	BATTING_TYPE_BANKER = 2
+)
+
+// 게임 결과
+const (
+	GAME_RESULT_WIN_PLAYER = 1
+	GAME_RESULT_WIN_BANKER = 2
+	GAME_RESULT_TIE = 3
+)
+
+type baccaratGameResultInfo struct {
+	cardsBanker [3]int8
+	cardsPlayer [3]int8
+
+	playerScore int8
+	bankerScore int8
+
+	result int8
+}
+
