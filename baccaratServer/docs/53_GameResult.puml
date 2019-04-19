@@ -1,0 +1,5 @@
+@startuml
+note left Client: 방의 모든 유저들
+note right GameServer: 카드를 추가로 받아야 한다면 추가 카드와 함께 결과를 보낸다
+Client <-- GameServer: PACKET_ID_GAME_RESULT_NTF
+@enduml
