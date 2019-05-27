@@ -77,3 +77,7 @@
 ## TCP 내트워크 프로그래밍과 GoHiperNet 
 - 이 [저장소](https://github.com/jacking75/golang_network_socket_study)에 있는 코드와 글을 기반으로 소켓 프로그래밍 방법을 배운다.
   
+## 네트워크 프로그래밍 학습 글
+- [오픈소스 코드로 배우는 Golang TCP Socket Server 프로그래밍 ](http://bit.ly/2PiUAPX )
+- [Go로 네트워크 프로그래밍 이야기](talk_GoNetworkProgramming.md )
+  
