@@ -47,7 +47,7 @@ func (server *ChatServer) PacketProcess_goroutine() {
 }
 
 func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
-	IsWantedTermination := false
+	IsWantedTermination := false  // 여기에서는 의미 없음. 서버 종료를 명시적으로 하는 경우만 유용
 	defer PrintPanicStack()
 
 

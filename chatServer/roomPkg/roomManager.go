@@ -65,6 +65,17 @@ func (roomMgr *RoomManager) _getRoomUserCount(roomId int32) int32 {
 func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Packet) {
 	NTELIB_LOG_DEBUG("[[RoomManager - PacketProcess]]", zap.Int16("PacketID", packet.Id))
 
+	isRoomEnterReq := false
+
+	if roomNumber == -1 && packet.Id == protocol.PACKET_ID_ROOM_ENTER_REQ {
+		isRoomEnterReq = true
+
+		var requestPacket protocol.RoomEnterReqPacket
+		(&requestPacket).Decoding(packet.Data)
+
+		roomNumber = requestPacket.RoomNumber
+	}
+
 	room := roomMgr.getRoomByNumber(roomNumber)
 	if room == nil {
 		protocol.NotifyErrorPacket(packet.UserSessionIndex, packet.UserSessionUniqueId,
@@ -73,8 +84,7 @@ func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Pack
 	}
 
 	user := room.getUser(packet.UserSessionUniqueId)
-
-	if user == nil && packet.Id != protocol.PACKET_ID_ROOM_ENTER_REQ {
+	if user == nil && isRoomEnterReq == false {
 		protocol.NotifyErrorPacket(packet.UserSessionIndex, packet.UserSessionUniqueId,
 			protocol.ERROR_CODE_ROOM_NOT_IN_USER)
 		return

@@ -48,7 +48,7 @@ func (server *ChatServer) PacketProcess_goroutine() {
 }
 
 func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
-	IsWantedTermination := false
+	IsWantedTermination := false // 이 서버에서는 별 의미가 없음
 	defer PrintPanicStack()
 
 	secondTimeticker := time.NewTicker(time.Second)
