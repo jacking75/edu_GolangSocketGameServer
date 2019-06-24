@@ -65,7 +65,7 @@ func createAnsStartServer(netConfig NetworkConfig, appConfig configAppServer) {
 	networkFunctor.OnReceive = server.OnReceive
 	networkFunctor.OnReceiveBufferedData = nil
 	networkFunctor.OnClose = server.OnClose
-	networkFunctor.PacketTotalSizeFunc = nil
+	networkFunctor.PacketTotalSizeFunc = PacketTotalSize
 	networkFunctor.PacketHeaderSize = PACKET_HEADER_SIZE
 	networkFunctor.IsClientSession = true
 

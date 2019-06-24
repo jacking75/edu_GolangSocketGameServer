@@ -51,15 +51,17 @@ func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (i
 	sessionIndex := session.Index
 	sessionUnique := session.SeqIndex
 
+	PacketHeaderSize := session.NetworkFunctor.PacketHeaderSize
+	PacketTotalSizeFunc := session.NetworkFunctor.PacketTotalSizeFunc
 	var startRecvPos int16 = 0
 	var readPos int16
 
 	for {
-		if readAbleByte < PACKET_HEADER_SIZE {
+		if readAbleByte < PacketHeaderSize {
 			break
 		}
 
-		requireDataSize := packetTotalSize(recviveBuff[readPos:])
+		requireDataSize := PacketTotalSizeFunc(recviveBuff[readPos:])
 
 		if requireDataSize > readAbleByte {
 			break

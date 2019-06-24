@@ -8,7 +8,7 @@ import (
 )
 
 
-func packetTotalSize(data []byte) int16 {
+func PacketTotalSize(data []byte) int16 {
 	totalsize := binary.LittleEndian.Uint16(data)
 	return int16(totalsize)
 }

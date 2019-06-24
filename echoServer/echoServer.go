@@ -33,7 +33,7 @@ func createServer(netConfig NetworkConfig) {
 	networkFunctor.OnReceive = server.OnReceive
 	networkFunctor.OnReceiveBufferedData = nil
 	networkFunctor.OnClose = server.OnClose
-	networkFunctor.PacketTotalSizeFunc = nil
+	networkFunctor.PacketTotalSizeFunc = PacketTotalSize
 	networkFunctor.PacketHeaderSize = PACKET_HEADER_SIZE
 	networkFunctor.IsClientSession = true
 

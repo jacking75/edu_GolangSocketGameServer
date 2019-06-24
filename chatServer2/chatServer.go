@@ -49,8 +49,8 @@ func createServer(netConfig NetworkConfig, appConfig configAppServer) {
 	networkFunctor.OnReceive = server.OnReceive
 	networkFunctor.OnReceiveBufferedData = nil
 	networkFunctor.OnClose = server.OnClose
-	networkFunctor.PacketTotalSizeFunc = nil
-	networkFunctor.PacketHeaderSize = 0 // 사용하지 않음
+	networkFunctor.PacketTotalSizeFunc = PacketTotalSize
+	networkFunctor.PacketHeaderSize = PACKET_HEADER_SIZE
 	networkFunctor.IsClientSession = true
 
 	// 실습에서는 아래 코드 호출하여도 적용 되자 않음
