@@ -94,7 +94,7 @@ func (session *TcpSession) closeProcess() {
 	session.TcpConn.Close()
 	session.NetworkFunctor.OnClose(session.Index, session.SeqIndex)
 
-	_tcpSessionManager.removeSession(session.SeqIndex)
+	_tcpSessionManager.removeSession(session.Index, session.SeqIndex)
 }
 
 // Send bytes to client
