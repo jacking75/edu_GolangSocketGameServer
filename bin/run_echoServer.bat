@@ -1,1 +1,0 @@
-echoServer.exe -c_IsTcp4Addr=true -c_BindAddress=127.0.0.1:11021 -c_MaxSessionCount=20000 -c_MaxPacketSize=1024

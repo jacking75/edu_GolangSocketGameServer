@@ -1,0 +1,11 @@
+C:\Users\syG\go\src\golang_socketGameServer_codelab\bin\csharp_test_client.exe.config
+C:\Users\syG\go\src\golang_socketGameServer_codelab\bin\csharp_test_client.exe
+C:\Users\syG\go\src\golang_socketGameServer_codelab\bin\csharp_test_client.pdb
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.csprojAssemblyReference.cache
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.mainForm.resources
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.Properties.Resources.resources
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.csproj.GenerateResource.cache
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.csproj.CoreCompileInputs.cache
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.csproj.CopyComplete
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.exe
+C:\Users\syG\go\src\golang_socketGameServer_codelab\csharp_test_client\obj\Debug\csharp_test_client.pdb
