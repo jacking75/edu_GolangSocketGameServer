@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 

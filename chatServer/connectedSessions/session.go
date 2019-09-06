@@ -3,19 +3,19 @@ package connectedSessions
 import (
 	"sync/atomic"
 
-	"golang_socketGameServer_codelab/chatServer/protocol"
+	"main/protocol"
 )
 
 type session struct {
 	_index int32
 
-	_networkUniqueID     uint64  //네트워크 세션의 유니크 ID
+	_networkUniqueID uint64 //네트워크 세션의 유니크 ID
 
 	_userID       [protocol.MAX_USER_ID_BYTE_LENGTH]byte
 	_userIDLength int8
 
-	_connectTimeSec int64 // 연결된 시간
-	_RoomNum        int32 //
+	_connectTimeSec    int64 // 연결된 시간
+	_RoomNum           int32 //
 	_RoomNumOfEntering int32 // 현재 입장 중인 룸의 번호
 }
 
@@ -77,9 +77,9 @@ func (session *session) GetConnectTimeSec() int64 {
 func (session *session) SetUser(sessionUniqueId uint64,
 	userID []byte,
 	curTimeSec int64,
-	) {
+) {
 	session.setUserID(userID)
-	session.setRoomNumber(sessionUniqueId,-1, curTimeSec) // 방어적인 목적으로 채널 번호 초기화
+	session.setRoomNumber(sessionUniqueId, -1, curTimeSec) // 방어적인 목적으로 채널 번호 초기화
 }
 
 func (session *session) IsAuth() bool {

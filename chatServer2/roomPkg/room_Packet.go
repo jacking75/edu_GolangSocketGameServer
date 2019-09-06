@@ -3,8 +3,8 @@ package roomPkg
 import (
 	"go.uber.org/zap"
 
-	"golang_socketGameServer_codelab/chatServer2/protocol"
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	"main/protocol"
+	. "gohipernetFake"
 )
 
 func (room *baseRoom) _packetProcess_Relay(user *roomUser, packet protocol.Packet) int16 {

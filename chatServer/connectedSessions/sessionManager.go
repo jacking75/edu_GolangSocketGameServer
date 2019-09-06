@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 // 스레드 세이프 해야 한다.
@@ -144,5 +144,3 @@ func GetRoomNumber(sessionIndex int32) (int32, int32) {
 	}
 	return _manager._sessionList[sessionIndex].getRoomNumber()
 }
-
-

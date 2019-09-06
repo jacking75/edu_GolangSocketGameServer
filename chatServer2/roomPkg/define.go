@@ -1,6 +1,6 @@
 package roomPkg
 
-import "golang_socketGameServer_codelab/chatServer2/protocol"
+import "main/protocol"
 
 type RoomConfig struct {
 	StartRoomNumber int32

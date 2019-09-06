@@ -3,10 +3,10 @@ package roomPkg
 import (
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/chatServer/connectedSessions"
-	"golang_socketGameServer_codelab/chatServer/protocol"
+	"main/connectedSessions"
+	"main/protocol"
 )
 
 func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet protocol.Packet) int16 {
@@ -18,10 +18,9 @@ func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet pro
 	var requestPacket protocol.RoomEnterReqPacket
 	(&requestPacket).Decoding(packet.Data)
 
-
 	userID, ok := connectedSessions.GetUserID(sessionIndex)
 	if ok == false {
-		_sendRoomEnterResult(sessionIndex, sessionUniqueId, 0,0, protocol.ERROR_CODE_ENTER_ROOM_INVALID_USER_ID)
+		_sendRoomEnterResult(sessionIndex, sessionUniqueId, 0, 0, protocol.ERROR_CODE_ENTER_ROOM_INVALID_USER_ID)
 		return protocol.ERROR_CODE_ENTER_ROOM_INVALID_USER_ID
 	}
 
@@ -50,7 +49,6 @@ func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet pro
 		room._sendUserInfoListPacket(newUser)
 	}
 
-
 	roomNumebr := room.getNumber()
 	_sendRoomEnterResult(sessionIndex, sessionUniqueId, roomNumebr, newUser.RoomUniqueId, protocol.ERROR_CODE_NONE)
 	return protocol.ERROR_CODE_NONE
@@ -65,7 +63,6 @@ func _sendRoomEnterResult(sessionIndex int32, sessionUniqueId uint64, roomNumber
 	sendPacket, _ := response.EncodingPacket()
 	NetLibIPostSendToClient(sessionIndex, sessionUniqueId, sendPacket)
 }
-
 
 func (room *baseRoom) _sendUserInfoListPacket(user *roomUser) {
 	NTELIB_LOG_DEBUG("Room _sendUserInfoListPacket", zap.Uint64("SessionUniqueId", user.netSessionUniqueId))
@@ -89,5 +86,3 @@ func (room *baseRoom) _sendNewUserInfoPacket(user *roomUser) {
 	sendBuf, packetSize := response.EncodingPacket(userInfoSize)
 	room.broadcastPacket(int16(packetSize), sendBuf, user.netSessionUniqueId) // 자신을 제외하고 모든 유저에게 Send
 }
-
-

@@ -3,11 +3,10 @@ package roomPkg
 import (
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/chatServer/protocol"
+	"main/protocol"
 )
-
 
 type RoomManager struct {
 	_roomStartNum  int32
@@ -105,9 +104,8 @@ func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Pack
 		return
 	}
 
-	NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail(Not Registered)]]", 								zap.Int16("PacketID", packet.Id))
+	NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail(Not Registered)]]", zap.Int16("PacketID", packet.Id))
 }
-
 
 func _log_StartRoomPacketProcess(maxRoomCount int32, config RoomConfig) {
 	NTELIB_LOG_INFO("[[[RoomManager _startRoomPacketProcess]]]",

@@ -8,10 +8,10 @@ import (
 
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
-	"golang_socketGameServer_codelab/chatServer2/connectedSessions"
-	"golang_socketGameServer_codelab/chatServer2/protocol"
-	"golang_socketGameServer_codelab/chatServer2/roomPkg"
+	. "gohipernetFake"
+	"main/connectedSessions"
+	"main/protocol"
+	"main/roomPkg"
 )
 
 type ChatServer struct {

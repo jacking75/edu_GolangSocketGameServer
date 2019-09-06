@@ -1,7 +1,7 @@
 package main
 
 import (
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 type configAppServer struct {

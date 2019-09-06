@@ -7,11 +7,11 @@ import (
 
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/baccaratServer/connectedSessions"
-	"golang_socketGameServer_codelab/baccaratServer/protocol"
-	"golang_socketGameServer_codelab/baccaratServer/roomPkg"
+	"main/connectedSessions"
+	"main/protocol"
+	"main/roomPkg"
 )
 
 type configAppServer struct {

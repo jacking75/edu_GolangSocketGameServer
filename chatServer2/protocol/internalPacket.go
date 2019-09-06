@@ -2,7 +2,7 @@
 package protocol
 
 import (
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 type InternalPacket struct {

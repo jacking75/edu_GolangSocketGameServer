@@ -5,8 +5,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"golang_socketGameServer_codelab/chatServer2/protocol"
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	"main/protocol"
+	. "gohipernetFake"
 )
 
 type CheckSessionStateConfig struct {

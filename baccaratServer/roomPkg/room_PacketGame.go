@@ -1,9 +1,9 @@
 package roomPkg
 
 import (
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/baccaratServer/protocol"
+	"main/protocol"
 )
 
 

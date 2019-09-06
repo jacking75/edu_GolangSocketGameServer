@@ -3,8 +3,8 @@ package roomPkg
 import (
 	"sync"
 
-	"golang_socketGameServer_codelab/baccaratServer/protocol"
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
+	"main/protocol"
 )
 
 type baseRoom struct {
@@ -26,7 +26,7 @@ type baseRoom struct {
 	_masterUserSessionUniqueId uint64 // 방장의 네트워크 유니크ID
 
 	_funcPackeIdlist []int16
-	_funclist []func(*roomUser, protocol.Packet) int16
+	_funclist        []func(*roomUser, protocol.Packet) int16
 
 	enterUserNotify func(int64, int32)
 	leaveUserNotify func(int64)
@@ -39,7 +39,6 @@ func (room *baseRoom) getIndex() int32 {
 func (room *baseRoom) getNumber() int32 {
 	return room._number
 }
-
 
 func (room *baseRoom) isStateNone() bool {
 	return room._curState == ROOM_STATE_NOE
@@ -68,7 +67,6 @@ func (room *baseRoom) changeState(state int) {
 	}
 }
 
-
 func (room *baseRoom) getMasterSessionUniqueId() uint64 {
 	return room._masterUserSessionUniqueId
 }
@@ -94,7 +92,6 @@ func (room *baseRoom) _settingMasterUser() {
 
 	room._masterUserSessionUniqueId = masterUniqueId
 }
-
 
 func (room *baseRoom) generateUserUniqueId() uint64 {
 	room._roomUserUnqieuIdSeq++
@@ -142,7 +139,7 @@ func (room *baseRoom) settingPacketFunction() {
 
 func (room *baseRoom) _addPacketFunction(packetID int16,
 	packetFunc func(*roomUser, protocol.Packet,
-		) int16) {
+	) int16) {
 	room._funclist = append(room._funclist, packetFunc)
 	room._funcPackeIdlist = append(room._funcPackeIdlist, packetID)
 }
@@ -173,7 +170,6 @@ func (room *baseRoom) addUser(userInfo addRoomUserInfo) (*roomUser, int16) {
 	if room.getUser(userInfo.netSessionUniqueId) != nil {
 		return nil, protocol.ERROR_CODE_ENTER_ROOM_DUPLCATION_USER
 	}
-
 
 	user := room._getUserObject()
 	user.init(userInfo.userID, room.generateUserUniqueId())
@@ -273,7 +269,7 @@ func (room *baseRoom) secondTimeEvent() {
 func (room *baseRoom) broadcastPacket(packetSize int16,
 	sendPacket []byte,
 	exceptSessionUniqueId uint64,
-	) {
+) {
 
 	for _, user := range room._userSessionUniqueIdMap {
 		if user.netSessionUniqueId == exceptSessionUniqueId {
@@ -332,6 +328,4 @@ func (room *baseRoom) checkState(curTimeMilliSec int64) {
 		}
 	}
 
-
 }
-

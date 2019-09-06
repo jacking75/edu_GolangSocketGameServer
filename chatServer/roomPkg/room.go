@@ -4,9 +4,9 @@ import (
 	"sync"
 	"sync/atomic"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/chatServer/protocol"
+	"main/protocol"
 )
 
 type baseRoom struct {
@@ -24,7 +24,7 @@ type baseRoom struct {
 	_userSessionUniqueIdMap map[uint64]*roomUser //range 순회 시 복사 비용이 발생해서 포인터 값을 사용한다.
 
 	_funcPackeIdlist []int16
-	_funclist []func(*roomUser, protocol.Packet) int16
+	_funclist        []func(*roomUser, protocol.Packet) int16
 
 	enterUserNotify func(int64, int32)
 	leaveUserNotify func(int64)
@@ -83,7 +83,7 @@ func (room *baseRoom) settingPacketFunction() {
 
 func (room *baseRoom) _addPacketFunction(packetID int16,
 	packetFunc func(*roomUser, protocol.Packet,
-		) int16) {
+	) int16) {
 	room._funclist = append(room._funclist, packetFunc)
 	room._funcPackeIdlist = append(room._funcPackeIdlist, packetID)
 }
@@ -211,7 +211,7 @@ func (room *baseRoom) secondTimeEvent() {
 func (room *baseRoom) broadcastPacket(packetSize int16,
 	sendPacket []byte,
 	exceptSessionUniqueId uint64,
-	) {
+) {
 
 	for _, user := range room._userSessionUniqueIdMap {
 		if user.netSessionUniqueId == exceptSessionUniqueId {

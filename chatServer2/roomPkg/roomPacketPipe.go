@@ -5,12 +5,12 @@ import (
 
 	"go.uber.org/zap"
 
-	"golang_socketGameServer_codelab/chatServer2/protocol"
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
+	"main/protocol"
 )
 
 type roomPacketPipe struct {
-	_roomCount int
+	_roomCount   int
 	_roomRefList []*baseRoom
 
 	_channelPacketCount    int32
@@ -57,7 +57,6 @@ func (packetPipe *roomPacketPipe) Stop() {
 	close(packetPipe._onDoneTerminateNotify)
 }
 
-
 func (packetPipe *roomPacketPipe) roomProcess_goroutine() {
 	NTELIB_LOG_INFO("start Park rooms process goroutine")
 
@@ -70,7 +69,6 @@ func (packetPipe *roomPacketPipe) roomProcess_goroutine() {
 
 	NTELIB_LOG_INFO("Stop rooms process goroutine")
 }
-
 
 func (packetPipe *roomPacketPipe) roomProcess_goroutine_Impl() bool {
 	IsWantedTermination := false
@@ -111,7 +109,7 @@ func (packetPipe *roomPacketPipe) _packetProcess(packet protocol.Packet) int16 {
 	room := packetPipe.getRoomByRoomNum(packet.RoomNumber)
 	if room == nil {
 		protocol.NotifyErrorPacket(packet.UserSessionIndex, packet.UserSessionUniqueId,
-						protocol.ERROR_CODE_ROOM_INVALIDE_NUMBER)
+			protocol.ERROR_CODE_ROOM_INVALIDE_NUMBER)
 		return protocol.ERROR_CODE_ROOM_INVALIDE_NUMBER
 	}
 
@@ -119,7 +117,7 @@ func (packetPipe *roomPacketPipe) _packetProcess(packet protocol.Packet) int16 {
 
 	if user == nil && packet.Id != protocol.PACKET_ID_ROOM_ENTER_REQ {
 		protocol.NotifyErrorPacket(packet.UserSessionIndex, packet.UserSessionUniqueId,
-							protocol.ERROR_CODE_ROOM_NOT_IN_USER)
+			protocol.ERROR_CODE_ROOM_NOT_IN_USER)
 		return protocol.ERROR_CODE_ROOM_NOT_IN_USER
 	}
 
@@ -138,7 +136,7 @@ func (packetPipe *roomPacketPipe) _packetProcess(packet protocol.Packet) int16 {
 		return protocol.ERROR_CODE_NONE
 	}
 
-	NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail(Not Registered)]]", 								zap.Int16("PacketID", packet.Id))
+	NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail(Not Registered)]]", zap.Int16("PacketID", packet.Id))
 	return protocol.ERROR_CODE_ROOM_NOT_REGISTED_PACKET_ID
 }
 

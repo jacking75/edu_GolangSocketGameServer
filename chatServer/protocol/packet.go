@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"reflect"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 const (
@@ -28,9 +28,9 @@ type Header struct {
 type Packet struct {
 	UserSessionIndex    int32
 	UserSessionUniqueId uint64
-	Id       int16
-	DataSize int16
-	Data     []byte
+	Id                  int16
+	DataSize            int16
+	Data                []byte
 }
 
 func (packet Packet) GetSessionInfo() (int32, uint64) {
@@ -90,7 +90,6 @@ func EncodingPacketHeader(writer *RawPacketData, totalSize int16, pktId int16, p
 	writer.WriteS8(packetType)
 }
 
-
 ///<<< 패킷 인코딩/디코딩
 
 // [[[ 로그인 ]]] PACKET_ID_LOGIN_REQ
@@ -122,7 +121,6 @@ func (loginReq *LoginReqPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 type LoginResPacket struct {
 	Result int16
 }
@@ -136,7 +134,6 @@ func (loginRes LoginResPacket) EncodingPacket() ([]byte, int16) {
 	writer.WriteS16(loginRes.Result)
 	return sendBuf, totalSize
 }
-
 
 // [[[  ]]]   PACKET_ID_ERROR_NTF
 type ErrorNtfPacket struct {
@@ -163,7 +160,6 @@ func (response *ErrorNtfPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 /// [ 방 입장 ]
 type RoomEnterReqPacket struct {
 	RoomNumber int32
@@ -189,10 +185,9 @@ func (request *RoomEnterReqPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 type RoomEnterResPacket struct {
-	Result int16
-	RoomNumber int32
+	Result           int16
+	RoomNumber       int32
 	RoomUserUniqueId uint64
 }
 
@@ -201,7 +196,7 @@ func (response RoomEnterResPacket) EncodingPacket() ([]byte, int16) {
 	sendBuf := make([]byte, totalSize)
 
 	writer := MakeWriter(sendBuf, true)
-	EncodingPacketHeader(&writer, totalSize, PACKET_ID_ROOM_ENTER_RES,  0)
+	EncodingPacketHeader(&writer, totalSize, PACKET_ID_ROOM_ENTER_RES, 0)
 	writer.WriteS16(response.Result)
 	writer.WriteS32(response.RoomNumber)
 	writer.WriteU64(response.RoomUserUniqueId)
@@ -209,7 +204,7 @@ func (response RoomEnterResPacket) EncodingPacket() ([]byte, int16) {
 }
 
 func (response *RoomEnterResPacket) Decoding(bodyData []byte) bool {
-	if len(bodyData) != (2+4+8) {
+	if len(bodyData) != (2 + 4 + 8) {
 		return false
 	}
 
@@ -220,12 +215,11 @@ func (response *RoomEnterResPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 ///  방에 있는 있는 유저 리스트 통보(채널에 들어오는 유저에게)
 type RoomUserInfoPktData struct {
 	UniqueId int64
-	IDLen int8
-	ID    []byte
+	IDLen    int8
+	ID       []byte
 }
 
 type RoomUserListNtfPacket struct {
@@ -252,7 +246,6 @@ func (notify RoomUserListNtfPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 // 채널에 있는 유저들에게 새 유저의 정보를 알려준다
 type RoomNewUserNtfPacket struct {
 	User []byte //RoomUserInfoPktData
@@ -267,8 +260,6 @@ func (notify RoomNewUserNtfPacket) EncodingPacket(userInfoSize int16) ([]byte, i
 	writer.WriteBytes(notify.User)
 	return sendBuf, totalSize
 }
-
-
 
 //<<< 방에서 나가기
 type RoomLeaveResPacket struct {
@@ -289,7 +280,6 @@ func (response *RoomLeaveResPacket) Decoding(bodyData []byte) bool {
 	response.Result, _ = reader.ReadS16()
 	return true
 }
-
 
 type RoomLeaveUserNtfPacket struct {
 	UserUniqueId uint64
@@ -314,9 +304,6 @@ func (notify RoomLeaveUserNtfPacket) Decoding(bodyData []byte) bool {
 	notify.UserUniqueId, _ = reader.ReadU64()
 	return true
 }
-
-
-
 
 /// [ 방 채팅 ]]
 type RoomChatReqPacket struct {
@@ -352,7 +339,6 @@ func (request *RoomChatReqPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 type RoomChatResPacket struct {
 	Result int16
 }
@@ -372,11 +358,10 @@ func (response *RoomChatResPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 type RoomChatNtfPacket struct {
 	RoomUserUniqueId uint64
-	MsgLen        int16
-	Msg           []byte
+	MsgLen           int16
+	Msg              []byte
 }
 
 func (response RoomChatNtfPacket) EncodingPacket() ([]byte, int16) {
@@ -399,11 +384,9 @@ func (response *RoomChatNtfPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
-
 ///<<< Room Relay
 type RoomRelayReqPacket struct {
-	Data      []byte
+	Data []byte
 }
 
 func (request RoomRelayReqPacket) EncodingPacket(size int16) ([]byte, int16) {
@@ -422,10 +405,9 @@ func (request *RoomRelayReqPacket) Decoding(bodyData []byte) bool {
 	return true
 }
 
-
 type RoomRelayNtfPacket struct {
 	RoomUserUniqueId uint64
-	Data      []byte
+	Data             []byte
 }
 
 func (notify RoomRelayNtfPacket) EncodingPacket(size int16) ([]byte, int16) {
@@ -445,7 +427,6 @@ func (notify *RoomRelayNtfPacket) Decoding(bodyData []byte) bool {
 	notify.Data = reader.ReadBytes(len(bodyData) - 8)
 	return true
 }
-
 
 func NotifyErrorPacket(sessionIndex int32, sessionUniqueId uint64, errorCode int16) {
 	var response ErrorNtfPacket

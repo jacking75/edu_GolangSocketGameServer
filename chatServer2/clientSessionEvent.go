@@ -4,8 +4,8 @@ package main
 import (
 	"go.uber.org/zap"
 
-	"golang_socketGameServer_codelab/chatServer2/connectedSessions"
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	"main/connectedSessions"
+	. "gohipernetFake"
 )
 
 func (server *ChatServer) OnConnect(sessionIndex int32, sessionUniqueID uint64) {

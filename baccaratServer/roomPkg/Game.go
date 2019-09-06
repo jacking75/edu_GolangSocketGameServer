@@ -4,14 +4,14 @@ import (
 	"math/rand"
 	"time"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 type baccaratGame struct {
 	_statusChangeCompletionMillSec int64 // 다음 상태로 바뀔 때까지의 시간. 0 이면 사용하지 않음.
-	_rand *rand.Rand
-	_dillerCardPos int
-	_cards []int8
+	_rand                          *rand.Rand
+	_dillerCardPos                 int
+	_cards                         []int8
 }
 
 func (game *baccaratGame) init() {
@@ -64,7 +64,7 @@ func (game *baccaratGame) doBaccarat() baccaratGameResultInfo {
 		player3CardScore := gameResult.cardsPlayer[2]
 
 		switch bankerScore {
-		case 0,1,2:
+		case 0, 1, 2:
 			gameResult.ThreeCardtoBanker(game._getDillerCard())
 		case 3:
 			if player3CardScore != 8 {
@@ -103,7 +103,7 @@ func _End(endResult *baccaratGameResultInfo) {
 	}
 }
 
-func (game *baccaratGame)_cardChuffle() {
+func (game *baccaratGame) _cardChuffle() {
 	// Fisher–Yates shuffle 알고리즘
 	// https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 

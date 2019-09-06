@@ -4,7 +4,7 @@ import (
 	"encoding/binary"
 	"reflect"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 const (

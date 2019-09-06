@@ -3,11 +3,10 @@ package roomPkg
 import (
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/chatServer/protocol"
+	"main/protocol"
 )
-
 
 func (room *baseRoom) _packetProcess_Chat(user *roomUser, packet protocol.Packet) int16 {
 	sessionIndex := packet.UserSessionIndex
@@ -26,14 +25,12 @@ func (room *baseRoom) _packetProcess_Chat(user *roomUser, packet protocol.Packet
 		return protocol.ERROR_CODE_ROOM_CHAT_CHAT_MSG_LEN
 	}
 
-
 	var chatNotifyResponse protocol.RoomChatNtfPacket
 	chatNotifyResponse.RoomUserUniqueId = user.RoomUniqueId
 	chatNotifyResponse.MsgLen = int16(msgLen)
 	chatNotifyResponse.Msg = chatPacket.Msgs
 	notifySendBuf, packetSize := chatNotifyResponse.EncodingPacket()
 	room.broadcastPacket(packetSize, notifySendBuf, 0)
-
 
 	_sendRoomChatResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_NONE)
 
@@ -44,7 +41,7 @@ func (room *baseRoom) _packetProcess_Chat(user *roomUser, packet protocol.Packet
 }
 
 func _sendRoomChatResult(sessionIndex int32, sessionUniqueId uint64, result int16) {
-	response := protocol.RoomChatResPacket{ result }
+	response := protocol.RoomChatResPacket{result}
 	sendPacket, _ := response.EncodingPacket()
 	NetLibIPostSendToClient(sessionIndex, sessionUniqueId, sendPacket)
 }

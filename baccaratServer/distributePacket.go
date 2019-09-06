@@ -5,10 +5,10 @@ import (
 	"go.uber.org/zap"
 	"time"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/baccaratServer/connectedSessions"
-	"golang_socketGameServer_codelab/baccaratServer/protocol"
+	"main/connectedSessions"
+	"main/protocol"
 )
 
 func (server *ChatServer) DistributePacket(sessionIndex int32,

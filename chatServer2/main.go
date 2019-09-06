@@ -5,8 +5,8 @@ import (
 
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
-	"golang_socketGameServer_codelab/chatServer2/protocol"
+	. "gohipernetFake"
+	"main/protocol"
 )
 
 func main() {

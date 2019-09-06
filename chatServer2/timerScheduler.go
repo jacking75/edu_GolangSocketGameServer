@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 type TimerScheduler struct {
@@ -44,9 +44,9 @@ func (scheduler *TimerScheduler) _periodicLoop_goroutine_Impl() bool {
 	for {
 		select {
 		/*case secondTime := <-secondTimeticker.C:
-			{
-				NetLibSetCurrnetUnixTime(secondTime.Unix())
-			}*/
+		{
+			NetLibSetCurrnetUnixTime(secondTime.Unix())
+		}*/
 		case <-scheduler.onDone:
 			{
 				IsWantedTermination = true

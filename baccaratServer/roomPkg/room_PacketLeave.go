@@ -3,10 +3,10 @@ package roomPkg
 import (
 	"go.uber.org/zap"
 
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 
-	"golang_socketGameServer_codelab/baccaratServer/connectedSessions"
-	"golang_socketGameServer_codelab/baccaratServer/protocol"
+	"main/connectedSessions"
+	"main/protocol"
 )
 
 

@@ -3,7 +3,7 @@ package connectedSessions
 import (
 	"sync/atomic"
 
-	"golang_socketGameServer_codelab/chatServer2/protocol"
+	"main/protocol"
 )
 
 type session struct {

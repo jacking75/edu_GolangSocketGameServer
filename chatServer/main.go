@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	
-	. "golang_socketGameServer_codelab/gohipernetFake"
+	. "gohipernetFake"
 )
 
 

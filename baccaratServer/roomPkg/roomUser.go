@@ -1,15 +1,15 @@
 package roomPkg
 
-import "golang_socketGameServer_codelab/baccaratServer/protocol"
+import "main/protocol"
 
 type roomUser struct {
-	netSessionIndex     int32
-	netSessionUniqueId  uint64
+	netSessionIndex    int32
+	netSessionUniqueId uint64
 
 	// <<< 다른 유저에게 알려줘야 하는 정보
 	RoomUniqueId uint64
-	IDLen int8
-	ID [protocol.MAX_USER_ID_BYTE_LENGTH]byte
+	IDLen        int8
+	ID           [protocol.MAX_USER_ID_BYTE_LENGTH]byte
 	// >>> 다른 유저에게 알려줘야 하는 정보
 	packetDataSize int16 // 다른 유저에게 알려줘야 하는 정보 의 크기
 
