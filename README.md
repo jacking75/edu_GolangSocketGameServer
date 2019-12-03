@@ -69,11 +69,19 @@
 - Redis 연동
 - API Server(http)와 연동  
     - 로그인을 API Server에서 한다.  
+     
+	 
+## msgpack을 사용한 chatServer	
+- 디렉토리: chatServer_msgpack
+- 클라이언트 디렉토리: csharp_test_client_msgpack	
+- 서버와 클라이언트가 네트워크로 주고 받는 패킷 데이터 포맷을 msgpack을 사용한다.
+    - [Go](https://github.com/vmihailenco/msgpack )
+	- [C#](https://github.com/ymofen/SimpleMsgPack.Net  ) 
+	    - golang 라이브러리와 데이터 포맷이 일치하지 않는 부분이 있어서 코드를 수정하였음.
+		- thirdparty/SimpleMsgPack.Net  디렉토리에 코드가 있다/
+    
     
 	
-
-  
-    
 ## TCP 내트워크 프로그래밍과 GoHiperNet 
 - 이 [저장소](https://github.com/jacking75/golang_network_socket_study)에 있는 코드와 글을 기반으로 소켓 프로그래밍 방법을 배운다.
   
