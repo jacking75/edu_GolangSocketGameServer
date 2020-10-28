@@ -31,6 +31,12 @@
 - 패킷의 총 크기(2바이트. 헤더와 보디 합친) + 패킷ID(2바이트) + 패킷Type(1바이트)  
   
     
+## 설명 영상
+- [실습 목적과 방법 설명](https://youtu.be/zR_zcY7SXio )
+- [Echo Server 만들기](https://youtu.be/OSiwcsPAO2o )
+- [채팅 서버 코드 설명](https://youtu.be/2rppKuW-wQg )
+  
+   
 ## echoServer
 - 디렉토리: echoServer
 - GoLand를 사용하여 golang용 프로그램을 만들고, 빌드/디버깅을 한다.
