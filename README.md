@@ -26,6 +26,11 @@
     - 코딩은 한번도 해본적인 없는 경우도 괜찮음.  
      
   	 
+## 패킷 헤더
+패킷 허더의 크기는 총 5바이트   
+- 패킷의 총 크기(2바이트. 헤더와 보디 합친) + 패킷ID(2바이트) + 패킷Type(1바이트)  
+  
+    
 ## echoServer
 - 디렉토리: echoServer
 - GoLand를 사용하여 golang용 프로그램을 만들고, 빌드/디버깅을 한다.
@@ -79,13 +84,9 @@
 	- [C#](https://github.com/ymofen/SimpleMsgPack.Net  ) 
 	    - golang 라이브러리와 데이터 포맷이 일치하지 않는 부분이 있어서 코드를 수정하였음.
 		- thirdparty/SimpleMsgPack.Net  디렉토리에 코드가 있다/
-    
-    
-	
-## TCP 내트워크 프로그래밍과 GoHiperNet 
-- 이 [저장소](https://github.com/jacking75/golang_network_socket_study)에 있는 코드와 글을 기반으로 소켓 프로그래밍 방법을 배운다.
-  
-## 네트워크 프로그래밍 학습 글
-- [오픈소스 코드로 배우는 Golang TCP Socket Server 프로그래밍 ](http://bit.ly/2PiUAPX )
-- [Go로 네트워크 프로그래밍 이야기](talk_GoNetworkProgramming.md )
+      
+   
+## 참고
+- [유튜브: 오픈소스 코드로 배우는 Golang TCP Socket Server 프로그래밍 ](https://youtu.be/boDo8JoyHuo )
+
   
