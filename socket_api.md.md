@@ -141,3 +141,13 @@ func setBuffer(conn *net.TCPConn) {
 	conn.SetReadBuffer(4000)
 }
 ```  
+  
+  
+## backlog 설정
+- https://qiita.com/kawasin73/items/7a24077fa3f89ce240c3
+    - 이 글을 보면 backlog 수를 리눅스의 설정 정보에 따라가는 것 같음 -_-
+	- 현재 backlog 수  `$ cat /proc/sys/net/core/somaxconn`
+	- backlog 수 늘리기. `$ sysctl -w net.core.somaxconn=1024`
+	- (중국어 문서)[이 글](https://blog.csdn.net/Neuliudapeng/article/details/73106809)을 보면 맞는 듯
+  
+  
