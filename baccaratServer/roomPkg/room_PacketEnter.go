@@ -1,7 +1,7 @@
 package roomPkg
 
 import (
-	"go.uber.org/zap"
+	"time"
 
 	. "gohipernetFake"
 
@@ -10,10 +10,9 @@ import (
 )
 
 func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet protocol.Packet) int16 {
-	curTime := NetLib_GetCurrnetUnixTime()
+	curTime := time.Now().Unix()
 	sessionIndex := packet.UserSessionIndex
 	sessionUniqueId := packet.UserSessionUniqueId
-	NTELIB_LOG_INFO("[[[Room _packetProcess_EnterUser]]]")
 
 	var requestPacket protocol.RoomEnterReqPacket
 	(&requestPacket).Decoding(packet.Data)
@@ -69,8 +68,6 @@ func _sendRoomEnterResult(sessionIndex int32, sessionUniqueId uint64, roomNumber
 
 
 func (room *baseRoom) _sendUserInfoListPacket(user *roomUser) {
-	NTELIB_LOG_DEBUG("Room _sendUserInfoListPacket", zap.Uint64("SessionUniqueId", user.netSessionUniqueId))
-
 	userCount, userInfoListSize, userInfoListBuffer := room.allocAllUserInfo(user.netSessionUniqueId)
 
 	var response protocol.RoomUserListNtfPacket
@@ -81,8 +78,6 @@ func (room *baseRoom) _sendUserInfoListPacket(user *roomUser) {
 }
 
 func (room *baseRoom) _sendNewUserInfoPacket(user *roomUser) {
-	NTELIB_LOG_DEBUG("Room _sendNewUserInfoPacket", zap.Uint64("SessionUniqueId", user.netSessionUniqueId))
-
 	userInfoSize, userInfoListBuffer := room._allocUserInfo(user)
 
 	var response protocol.RoomNewUserNtfPacket

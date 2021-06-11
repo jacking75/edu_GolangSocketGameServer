@@ -1,10 +1,6 @@
 package roomPkg
 
 import (
-	"go.uber.org/zap"
-
-	. "gohipernetFake"
-
 	"main/protocol"
 )
 
@@ -32,10 +28,6 @@ func (roomMgr *RoomManager) _initialize(config RoomConfig) {
 		roomMgr._roomList[i].initialize(i, config)
 		roomMgr._roomList[i].settingPacketFunction()
 	}
-
-	_log_StartRoomPacketProcess(config.MaxRoomCount, config)
-
-	NTELIB_LOG_INFO("[[[RoomManager initialize - Park]]]", zap.Int32("_maxRoomCount", roomMgr._maxRoomCount))
 }
 
 func (roomMgr *RoomManager) GetAllChannelUserCount() []int16 {
@@ -63,8 +55,6 @@ func (roomMgr *RoomManager) _getRoomUserCount(roomId int32) int {
 }
 
 func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Packet) {
-	NTELIB_LOG_DEBUG("[[RoomManager - PacketProcess]]", zap.Int16("PacketID", packet.Id))
-
 	isRoomEnterReq := false
 
 	if roomNumber == -1 && packet.Id == protocol.PACKET_ID_ROOM_ENTER_REQ {
@@ -96,16 +86,9 @@ func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Pack
 			continue
 		}
 
-		result := room._funclist[i](user, packet)
-		if result != protocol.ERROR_CODE_NONE {
-			NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail]]",
-				zap.Int16("PacketID", packet.Id), zap.Int16("Error", result))
-		}
-
+		room._funclist[i](user, packet)
 		return
 	}
-
-	NTELIB_LOG_DEBUG("[[Room - _packetProcess - Fail(Not Registered)]]", zap.Int16("PacketID", packet.Id))
 }
 
 func (roomMgr *RoomManager) CheckRoomState(curTimeMilliSec int64) {
@@ -114,13 +97,4 @@ func (roomMgr *RoomManager) CheckRoomState(curTimeMilliSec int64) {
 	for i := 0; i < (int)(roomMgr._maxRoomCount); i++ {
 		roomMgr._roomList[i].checkState(curTimeMilliSec)
 	}
-}
-
-
-
-func _log_StartRoomPacketProcess(maxRoomCount int32, config RoomConfig) {
-	NTELIB_LOG_INFO("[[[RoomManager _startRoomPacketProcess]]]",
-		zap.Int32("maxRoomCount", maxRoomCount),
-		zap.Int32("StartRoomNumber", config.StartRoomNumber),
-		zap.Int32("MaxUserCount", config.MaxUserCount))
 }

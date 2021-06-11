@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	NetLibInitLog()
+	NetLibInitLog(LOG_LEVEL_DEBUG, nil)
 
 	netConfig, appConfig := parseAppConfig()
 	netConfig.WriteNetworkConfig(true)
@@ -17,9 +17,6 @@ func main() {
 }
 
 func parseAppConfig() (NetworkConfig, configAppServer) {
-	NTELIB_LOG_INFO("[[Setting NetworkConfig]]")
-
-	//TODO flag 사용하기
 	appConfig := configAppServer{
 		"chatServer",
 		1000,

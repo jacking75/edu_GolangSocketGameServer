@@ -1,8 +1,6 @@
 package roomPkg
 
 import (
-	"go.uber.org/zap"
-
 	. "gohipernetFake"
 
 	"main/protocol"
@@ -36,9 +34,6 @@ func (room *baseRoom) _packetProcess_Chat(user *roomUser, packet protocol.Packet
 
 
 	_sendRoomChatResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_NONE)
-
-	NTELIB_LOG_DEBUG("ParkChannel Chat Notify Function", zap.String("Sender", string(user.ID[:])),
-		zap.String("Message", string(chatPacket.Msgs)))
 
 	return protocol.ERROR_CODE_NONE
 }

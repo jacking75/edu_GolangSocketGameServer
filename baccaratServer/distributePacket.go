@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"go.uber.org/zap"
 	"time"
 
 	. "gohipernetFake"
@@ -17,8 +16,6 @@ func (server *ChatServer) DistributePacket(sessionIndex int32,
 	) {
 	packetID := protocol.PeekPacketID(packetData)
 	bodySize, bodyData := protocol.PeekPacketBody(packetData)
-	NTELIB_LOG_DEBUG("DistributePacket", zap.Int32("sessionIndex", sessionIndex), zap.Uint64("sessionUniqueId", sessionUniqueId), zap.Int16("PacketID", packetID))
-
 
 	packet := protocol.Packet{Id: packetID}
 	packet.UserSessionIndex = sessionIndex
@@ -29,22 +26,18 @@ func (server *ChatServer) DistributePacket(sessionIndex int32,
 	copy(packet.Data, bodyData)
 
 	server.PacketChan <- packet
-
-	NTELIB_LOG_DEBUG("_distributePacket", zap.Int32("sessionIndex", sessionIndex), zap.Int16("PacketId", packetID))
 }
 
 
 func (server *ChatServer) PacketProcess_goroutine() {
-	NTELIB_LOG_INFO("start PacketProcess goroutine")
-
 	for {
 		if server.PacketProcess_goroutine_Impl() {
-			NTELIB_LOG_INFO("Wanted Stop PacketProcess goroutine")
+			OutPutLog(LOG_LEVEL_INFO,"", 0,"Wanted Stop PacketProcess goroutine")
 			break
 		}
 	}
 
-	NTELIB_LOG_INFO("Stop rooms PacketProcess goroutine")
+	OutPutLog(LOG_LEVEL_INFO,"", 0,"Stop rooms PacketProcess goroutine")
 }
 
 func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
@@ -101,7 +94,7 @@ func ProcessPacketLogin(sessionIndex int32,
 		return
 	}
 
-	curTime := NetLib_GetCurrnetUnixTime()
+	curTime := time.Now().Unix()
 
 	if connectedSessions.SetLogin(sessionIndex, sessionUniqueId, userID, curTime) == false {
 		_sendLoginResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_LOGIN_USER_DUPLICATION)
@@ -117,7 +110,6 @@ func _sendLoginResult(sessionIndex int32, sessionUniqueId uint64, result int16) 
 	sendPacket, _ := response.EncodingPacket()
 
 	NetLibIPostSendToClient(sessionIndex, sessionUniqueId, sendPacket)
-	NTELIB_LOG_DEBUG("SendLoginResult", zap.Int32("sessionIndex", sessionIndex), zap.Int16("result", result))
 }
 
 

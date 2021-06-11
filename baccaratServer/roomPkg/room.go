@@ -2,6 +2,7 @@ package roomPkg
 
 import (
 	"sync"
+	"time"
 
 	. "gohipernetFake"
 	"main/protocol"
@@ -63,7 +64,7 @@ func (room *baseRoom) changeState(state int) {
 	if room._curState == ROOM_STATE_NOE {
 		room._gameLogic.clear()
 	} else if room._curState == ROOM_STATE_GAME_WAIT_BATTING {
-		room._gameLogic.setBattingWaitTime(NetLib_GetCurrnetUnixTime())
+		room._gameLogic.setBattingWaitTime(time.Now().Unix())
 	}
 }
 

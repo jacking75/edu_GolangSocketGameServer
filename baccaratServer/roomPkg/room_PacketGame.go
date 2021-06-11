@@ -8,8 +8,6 @@ import (
 
 
 func (room *baseRoom) _packetProcess_GameStart(user *roomUser, packet protocol.Packet) int16 {
-	NTELIB_LOG_DEBUG("[[Room _packetProcess_GameStart ]")
-
 	errorCode := (int16)(protocol.ERROR_CODE_NONE)
 	sessionIndex := packet.UserSessionIndex
 	sessionUniqueId := packet.UserSessionUniqueId
@@ -59,8 +57,6 @@ func _sendRoomGameStartNotify(room *baseRoom) {
 
 
 func (room *baseRoom) _packetProcess_GameBatting(user *roomUser, packet protocol.Packet) int16 {
-	NTELIB_LOG_DEBUG("[[Room _packetProcess_GameBatting ]")
-
 	errorCode := (int16)(protocol.ERROR_CODE_NONE)
 	sessionIndex := packet.UserSessionIndex
 	sessionUniqueId := packet.UserSessionUniqueId

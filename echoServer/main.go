@@ -7,7 +7,7 @@ import (
 
 
 func main() {
-	NetLibInitLog()
+	NetLibInitLog(LOG_LEVEL_DEBUG, nil)
 
 	netConfigClient := parseAppConfig()
 	netConfigClient.WriteNetworkConfig(true)
@@ -17,8 +17,6 @@ func main() {
 }
 
 func parseAppConfig() NetworkConfig {
-	NTELIB_LOG_INFO("[[Setting NetworkConfig]]")
-
 	client := NetworkConfig{}
 
 	flag.BoolVar(&client.IsTcp4Addr,"c_IsTcp4Addr", true, "bool flag")

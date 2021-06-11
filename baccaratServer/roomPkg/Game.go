@@ -3,8 +3,6 @@ package roomPkg
 import (
 	"math/rand"
 	"time"
-
-	. "gohipernetFake"
 )
 
 type baccaratGame struct {
@@ -88,7 +86,7 @@ func (game *baccaratGame) doBaccarat() baccaratGameResultInfo {
 
 	_End(&gameResult)
 
-	game._statusChangeCompletionMillSec = NetLib_GetCurrnetUnixTime() + NEXT_GAME_WAIT_MILLISEC
+	game._statusChangeCompletionMillSec = time.Now().Unix() + NEXT_GAME_WAIT_MILLISEC
 	return gameResult
 }
 

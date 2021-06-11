@@ -2,7 +2,7 @@ package roomPkg
 
 import (
 	"github.com/vmihailenco/msgpack/v4"
-	"go.uber.org/zap"
+	"time"
 
 	. "gohipernetFake"
 
@@ -11,8 +11,6 @@ import (
 )
 
 func (room *baseRoom) _packetProcess_LeaveUser(user *roomUser, packet protocol.Packet) int16 {
-	NTELIB_LOG_DEBUG("[[Room _packetProcess_LeaveUser ]")
-
 	room._leaveUserProcess(user)
 
 	sessionIndex := packet.UserSessionIndex
@@ -22,8 +20,6 @@ func (room *baseRoom) _packetProcess_LeaveUser(user *roomUser, packet protocol.P
 }
 
 func (room *baseRoom) _leaveUserProcess(user *roomUser) {
-	NTELIB_LOG_DEBUG("[[Room _leaveUserProcess]")
-
 	roomUserUniqueId := user.RoomUniqueId
 	userSessionIndex := user.netSessionIndex
 	userSessionUniqueId := user.netSessionUniqueId
@@ -32,7 +28,7 @@ func (room *baseRoom) _leaveUserProcess(user *roomUser) {
 
 	room._sendRoomLeaveUserNotify(roomUserUniqueId, userSessionUniqueId)
 
-	curTime := NetLib_GetCurrnetUnixTime()
+	curTime := time.Now().Unix()
 	connectedSessions.SetRoomNumber(userSessionIndex, userSessionUniqueId, -1, curTime)
 }
 
@@ -48,8 +44,6 @@ func _sendRoomLeaveResult(sessionIndex int32, sessionUniqueId uint64, result int
 }
 
 func (room *baseRoom) _sendRoomLeaveUserNotify(roomUserUniqueId uint64, userSessionUniqueId uint64) {
-	NTELIB_LOG_DEBUG("Room _sendRoomLeaveUserNotify", zap.Uint64("userSessionUniqueId", userSessionUniqueId), zap.Int32("RoomIndex", room._index))
-
 	notifyPacket := protocol.RoomLeaveUserNtfPacket{roomUserUniqueId}
 
 	bodyData, err := msgpack.Marshal(notifyPacket)

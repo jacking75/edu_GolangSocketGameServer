@@ -7,17 +7,6 @@ import (
 
 
 func main() {
-	type Item struct {
-		Fo string
-	}
-
-	/*b, err := msgpack.Marshal(&Item{Fo: "bar"})
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(b)*/
-	NetLibInitLog()
-
 	netConfig, appConfig := parseAppConfig()
 	netConfig.WriteNetworkConfig(true)
 
@@ -26,9 +15,6 @@ func main() {
 }
 
 func parseAppConfig() (NetworkConfig, configAppServer) {
-	NTELIB_LOG_INFO("[[Setting NetworkConfig]]")
-
-	//TODO flag 사용하기
 	appConfig := configAppServer {
 		"chatServer",
 		1000,
