@@ -2,23 +2,22 @@ package roomPkg
 
 import (
 	"go.uber.org/zap"
+	"time"
 
 	. "gohipernetFake"
 
-	"main/connectedSessions"
 	"main/protocol"
 )
 
 func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet protocol.Packet) int16 {
-	curTime := NetLib_GetCurrnetUnixTime()
+	curTime := time.Now().Unix()
 	sessionIndex := packet.UserSessionIndex
 	sessionUniqueId := packet.UserSessionUniqueId
-	NTELIB_LOG_INFO("[[[Room _packetProcess_EnterUser]]]")
 
 	var requestPacket protocol.RoomEnterReqPacket
 	(&requestPacket).Decoding(packet.Data)
 
-	userID, ok := connectedSessions.GetUserID(sessionIndex)
+	userID, ok := connMgrGetUserID(sessionIndex)
 	if ok == false {
 		_sendRoomEnterResult(sessionIndex, sessionUniqueId, 0, 0, protocol.ERROR_CODE_ENTER_ROOM_INVALID_USER_ID)
 		return protocol.ERROR_CODE_ENTER_ROOM_INVALID_USER_ID

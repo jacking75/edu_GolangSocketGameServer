@@ -2,13 +2,12 @@ package main
 
 import (
 	"flag"
-	
 	. "gohipernetFake"
 )
 
 
 func main() {
-	NetLibInitLog()
+	NetLibInitLog(LOG_LEVEL_DEBUG, nil)
 
 	netConfig, appConfig := parseAppConfig()
 	netConfig.WriteNetworkConfig(true)
@@ -18,7 +17,7 @@ func main() {
 }
 
 func parseAppConfig() (NetworkConfig, configAppServer) {
-	NTELIB_LOG_INFO("[[Setting NetworkConfig]]")
+	OutPutLog(LOG_LEVEL_INFO,"", 0,"[[Setting NetworkConfig]]")
 
 	//TODO flag 사용하기
 	appConfig := configAppServer {
@@ -39,3 +38,4 @@ func parseAppConfig() (NetworkConfig, configAppServer) {
 	flag.Parse()
 	return netConfig, appConfig
 }
+

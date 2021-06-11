@@ -1,10 +1,6 @@
 package roomPkg
 
 import (
-	"go.uber.org/zap"
-
-	. "gohipernetFake"
-
 	"main/protocol"
 )
 
@@ -15,6 +11,5 @@ func (room *baseRoom) _packetProcess_Relay(user *roomUser, packet protocol.Packe
 	notifySendBuf, packetSize := relayNotify.EncodingPacket(packet.DataSize)
 	room.broadcastPacket(packetSize, notifySendBuf, 0)
 
-	NTELIB_LOG_DEBUG("Room Relay", zap.String("Sender", string(user.ID[:])))
 	return protocol.ERROR_CODE_NONE
 }

@@ -2,11 +2,10 @@ package main
 
 import (
 	"bytes"
-	"go.uber.org/zap"
+	"time"
 
 	. "gohipernetFake"
 
-	"main/connectedSessions"
 	"main/protocol"
 )
 
@@ -16,7 +15,6 @@ func (server *ChatServer) DistributePacket(sessionIndex int32,
 	) {
 	packetID := protocol.PeekPacketID(packetData)
 	bodySize, bodyData := protocol.PeekPacketBody(packetData)
-	NTELIB_LOG_DEBUG("DistributePacket", zap.Int32("sessionIndex", sessionIndex), zap.Uint64("sessionUniqueId", sessionUniqueId), zap.Int16("PacketID", packetID))
 
 
 	packet := protocol.Packet{Id: packetID}
@@ -28,22 +26,18 @@ func (server *ChatServer) DistributePacket(sessionIndex int32,
 	copy(packet.Data, bodyData)
 
 	server.PacketChan <- packet
-
-	NTELIB_LOG_DEBUG("_distributePacket", zap.Int32("sessionIndex", sessionIndex), zap.Int16("PacketId", packetID))
 }
 
 
 func (server *ChatServer) PacketProcess_goroutine() {
-	NTELIB_LOG_INFO("start PacketProcess goroutine")
-
 	for {
 		if server.PacketProcess_goroutine_Impl() {
-			NTELIB_LOG_INFO("Wanted Stop PacketProcess goroutine")
+			OutPutLog(LOG_LEVEL_INFO, "", 0, "Wanted Stop PacketProcess goroutine")
 			break
 		}
 	}
 
-	NTELIB_LOG_INFO("Stop rooms PacketProcess goroutine")
+	OutPutLog(LOG_LEVEL_INFO, "", 0,"Stop rooms PacketProcess goroutine")
 }
 
 func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
@@ -63,7 +57,7 @@ func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
 		} else if packet.Id == protocol.PACKET_ID_SESSION_CLOSE_SYS {
 			ProcessPacketSessionClosed(server,  sessionIndex, sessionUniqueId)
 		} else {
-			roomNumber, _ := connectedSessions.GetRoomNumber(sessionIndex)
+			roomNumber, _ := connMgrGetRoomNumber(sessionIndex)
 			server.RoomMgr.PacketProcess(roomNumber, packet)
 		}
 	}
@@ -89,9 +83,9 @@ func ProcessPacketLogin(sessionIndex int32,
 		return
 	}
 
-	curTime := NetLib_GetCurrnetUnixTime()
+	curTime := time.Now().Unix()
 
-	if connectedSessions.SetLogin(sessionIndex, sessionUniqueId, userID, curTime) == false {
+	if connMgrSetLogin(sessionIndex, sessionUniqueId, userID, curTime) == false {
 		_sendLoginResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_LOGIN_USER_DUPLICATION)
 		return
 	}
@@ -105,12 +99,11 @@ func _sendLoginResult(sessionIndex int32, sessionUniqueId uint64, result int16) 
 	sendPacket, _ := response.EncodingPacket()
 
 	NetLibIPostSendToClient(sessionIndex, sessionUniqueId, sendPacket)
-	NTELIB_LOG_DEBUG("SendLoginResult", zap.Int32("sessionIndex", sessionIndex), zap.Int16("result", result))
 }
 
 
 func ProcessPacketSessionClosed(server *ChatServer, sessionIndex int32, sessionUniqueId uint64) {
-	roomNumber, _ := connectedSessions.GetRoomNumber(sessionIndex)
+	roomNumber, _ := connMgrGetRoomNumber(sessionIndex)
 
 	if roomNumber > -1 {
 		packet := protocol.Packet{
@@ -124,7 +117,7 @@ func ProcessPacketSessionClosed(server *ChatServer, sessionIndex int32, sessionU
 		server.RoomMgr.PacketProcess(roomNumber, packet)
 	}
 
-	connectedSessions.RemoveSession(sessionIndex, true)
+	connMgrRemoveSession(sessionIndex, true)
 }
 
 
