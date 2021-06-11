@@ -6,6 +6,7 @@ import (
 
 	. "gohipernetFake"
 
+	"main/connectedSessions"
 	"main/protocol"
 	"main/roomPkg"
 )
@@ -41,7 +42,7 @@ func createAnsStartServer(netConfig NetworkConfig, appConfig configAppServer) {
 	protocol.Init_packet();
 
 	maxUserCount := appConfig.RoomMaxCount * appConfig.RoomMaxUserCount
-	connMgrInit(netConfig.MaxSessionCount, maxUserCount)
+	connectedSessions.Init(netConfig.MaxSessionCount, maxUserCount)
 
 	server.PacketChan = make(chan protocol.Packet, 256)
 
@@ -85,7 +86,7 @@ func (server *ChatServer) setIPAddress(ipAddress string) bool {
 
 
 func (server *ChatServer) OnConnect(sessionIndex int32, sessionUniqueID uint64) {
-	connMgrAddSession(sessionIndex, sessionUniqueID)
+	connectedSessions.AddSession(sessionIndex, sessionUniqueID)
 }
 
 func (server *ChatServer) OnReceive(sessionIndex int32, sessionUniqueID uint64, data []byte) bool {
@@ -100,8 +101,8 @@ func (server *ChatServer) OnClose(sessionIndex int32, sessionUniqueID uint64) {
 func (server *ChatServer) disConnectClient(sessionIndex int32, sessionUniqueId uint64) {
 	// 로그인도 안한 유저라면 그냥 여기서 처리한다.
 	// 방 입장을 안한 유저라면 여기서 처리해도 괜찮지만 아래로 넘긴다.
-	if connMgrIsLoginUser(sessionIndex) == false {
-		connMgrRemoveSession(sessionIndex, false)
+	if connectedSessions.IsLoginUser(sessionIndex) == false {
+		connectedSessions.RemoveSession(sessionIndex, false)
 		return
 	}
 

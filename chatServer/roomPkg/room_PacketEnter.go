@@ -1,11 +1,11 @@
 package roomPkg
 
 import (
-	"go.uber.org/zap"
 	"time"
 
 	. "gohipernetFake"
 
+	"main/connectedSessions"
 	"main/protocol"
 )
 
@@ -17,7 +17,7 @@ func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet pro
 	var requestPacket protocol.RoomEnterReqPacket
 	(&requestPacket).Decoding(packet.Data)
 
-	userID, ok := connMgrGetUserID(sessionIndex)
+	userID, ok := connectedSessions.GetUserID(sessionIndex)
 	if ok == false {
 		_sendRoomEnterResult(sessionIndex, sessionUniqueId, 0, 0, protocol.ERROR_CODE_ENTER_ROOM_INVALID_USER_ID)
 		return protocol.ERROR_CODE_ENTER_ROOM_INVALID_USER_ID
@@ -64,8 +64,6 @@ func _sendRoomEnterResult(sessionIndex int32, sessionUniqueId uint64, roomNumber
 }
 
 func (room *baseRoom) _sendUserInfoListPacket(user *roomUser) {
-	NTELIB_LOG_DEBUG("Room _sendUserInfoListPacket", zap.Uint64("SessionUniqueId", user.netSessionUniqueId))
-
 	userCount, userInfoListSize, userInfoListBuffer := room.allocAllUserInfo(user.netSessionUniqueId)
 
 	var response protocol.RoomUserListNtfPacket
@@ -76,8 +74,6 @@ func (room *baseRoom) _sendUserInfoListPacket(user *roomUser) {
 }
 
 func (room *baseRoom) _sendNewUserInfoPacket(user *roomUser) {
-	NTELIB_LOG_DEBUG("Room _sendNewUserInfoPacket", zap.Uint64("SessionUniqueId", user.netSessionUniqueId))
-
 	userInfoSize, userInfoListBuffer := room._allocUserInfo(user)
 
 	var response protocol.RoomNewUserNtfPacket

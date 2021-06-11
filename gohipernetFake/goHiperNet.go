@@ -3,13 +3,12 @@ package gohipernetFake
 
 
 
-func NetLibInitLog() {
-	init_Log()
-	wrapLoggerFunc()
-}
-// 네트워크 초기화
-func NetLibInitNetwork(clientHeaderSize int16, serverHeaderSize int16) {
-	init_Network_Impl(clientHeaderSize, serverHeaderSize)
+func NetLibInitLog(loglevel int, logFunc func(int, string, uint64, string)) {
+	_logLevel = loglevel
+
+	if logFunc != nil {
+		OutPutLog = logFunc
+	}
 }
 
 // 네트워크 시작
@@ -17,10 +16,9 @@ func NetLibStartNetwork(clientConfig *NetworkConfig, networkFunctor SessionNetwo
 	start_Network_Impl(clientConfig, networkFunctor)
 }
 
-
-// Send Interface Function
-// 여기에서는 NetLibISendToClient 와 NetLibIPostSendToClient는 같은 동작을 한다.
-// NetLibISendToAllClient 와 NetLibIPostSendToClient도 같다.
+func NetLibStopListen() {
+	stopListen_impl()
+}
 
 // 특정 클라이언트에게 데이터를 보낸다
 var NetLibISendToClient func(int32, uint64, []byte) bool

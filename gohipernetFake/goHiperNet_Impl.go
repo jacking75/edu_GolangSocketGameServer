@@ -3,19 +3,8 @@ package gohipernetFake
 import (
 	"log"
 	"net"
-	//"os"
 	"sync/atomic"
-
-	//"go.uber.org/zap"
-
 )
-
-
-func init_Network_Impl(clientHeaderSize int16, serverHeaderSize int16) {
-	defer PrintPanicStack()
-
-	_InitNetworkSendFunction()
-}
 
 
 func start_Network_Impl(clientConfig *NetworkConfig, networkFunctor SessionNetworkFunctors) {
@@ -26,16 +15,13 @@ func start_Network_Impl(clientConfig *NetworkConfig, networkFunctor SessionNetwo
 	_start_TCPServer_block(clientConfig, networkFunctor)
 }
 
-// 대기하다가 채널에 통지가 오면 listen 소켓을 종료한다
-func _stopTCPServerAccept_goroutine(onDone <-chan struct{}) {
-	Logger.Info("Stop TCPServer Accept")
-	IExportLog("INFO", "Stop TCPServer Accept")
+func stopListen_impl() {
+	_ = _mClientListener.Close()
 }
 
 func _start_TCPServer_block(config *NetworkConfig, networkFunctor SessionNetworkFunctors) {
 	defer PrintPanicStack()
-	Logger.Info("tcpServerStart - Start")
-	IExportLog("Info", "tcpServerStart - Start")
+	logInfo("", 0, "tcpServerStart - Start")
 
 	var err error
 	tcpAddr, _ := net.ResolveTCPAddr("tcp", config.BindAddress)
@@ -61,8 +47,7 @@ func _start_TCPServer_block(config *NetworkConfig, networkFunctor SessionNetwork
 		go client.handleTcpRead(networkFunctor)
 	}
 
-	Logger.Info("tcpServerStart - End")
-	IExportLog("Info", "tcpServerStart - End")
+	logInfo("", 0, "tcpServerStart - End")
 }
 
 // 보내기 함수(선언만 있는. 일종의 인터페이스)에 실제 동작함수를 연결한다
@@ -72,7 +57,7 @@ func _InitNetworkSendFunction() {
 	NetLibIPostSendToAllClient = postSendToAllClient
 	NetLibIPostSendToClient = postSendToClient
 
-	Logger.Info("call _InitNetworkSendFunction")
+	logInfo("", 0, "call _InitNetworkSendFunction")
 }
 
 func sendToClient(sessionIndex int32, sessionUniqueID uint64, data []byte) bool {

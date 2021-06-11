@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"main/connectedSessions"
 	"time"
 
 	. "gohipernetFake"
@@ -57,7 +58,7 @@ func (server *ChatServer) PacketProcess_goroutine_Impl() bool {
 		} else if packet.Id == protocol.PACKET_ID_SESSION_CLOSE_SYS {
 			ProcessPacketSessionClosed(server,  sessionIndex, sessionUniqueId)
 		} else {
-			roomNumber, _ := connMgrGetRoomNumber(sessionIndex)
+			roomNumber, _ := connectedSessions.GetRoomNumber(sessionIndex)
 			server.RoomMgr.PacketProcess(roomNumber, packet)
 		}
 	}
@@ -85,7 +86,7 @@ func ProcessPacketLogin(sessionIndex int32,
 
 	curTime := time.Now().Unix()
 
-	if connMgrSetLogin(sessionIndex, sessionUniqueId, userID, curTime) == false {
+	if connectedSessions.SetLogin(sessionIndex, sessionUniqueId, userID, curTime) == false {
 		_sendLoginResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_LOGIN_USER_DUPLICATION)
 		return
 	}
@@ -103,7 +104,7 @@ func _sendLoginResult(sessionIndex int32, sessionUniqueId uint64, result int16) 
 
 
 func ProcessPacketSessionClosed(server *ChatServer, sessionIndex int32, sessionUniqueId uint64) {
-	roomNumber, _ := connMgrGetRoomNumber(sessionIndex)
+	roomNumber, _ := connectedSessions.GetRoomNumber(sessionIndex)
 
 	if roomNumber > -1 {
 		packet := protocol.Packet{
@@ -117,7 +118,7 @@ func ProcessPacketSessionClosed(server *ChatServer, sessionIndex int32, sessionU
 		server.RoomMgr.PacketProcess(roomNumber, packet)
 	}
 
-	connMgrRemoveSession(sessionIndex, true)
+	connectedSessions.RemoveSession(sessionIndex, true)
 }
 
 
