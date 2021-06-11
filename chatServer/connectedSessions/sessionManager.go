@@ -3,10 +3,7 @@ package connectedSessions
 import (
 	"sync"
 	"sync/atomic"
-
-	"go.uber.org/zap"
-
-	. "gohipernetFake"
+	"time"
 )
 
 // 스레드 세이프 해야 한다.
@@ -42,25 +39,22 @@ func Init(maxSessionCount int, maxUserCount int32) bool {
 
 func AddSession(sessionIndex int32, sessionUniqueID uint64) bool {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return false
 	}
 
 	if _manager._sessionList[sessionIndex].GetConnectTimeSec() > 0 {
-		NTELIB_LOG_ERROR("already connected session", zap.Int32("sessionIndex", sessionIndex))
 		return false
 	}
 
 	// 방어적인 목적으로 한번 더 Clear 한다
 	_manager._sessionList[sessionIndex].Clear()
 
-	_manager._sessionList[sessionIndex].SetConnectTimeSec(NetLib_GetCurrnetUnixTime(), sessionUniqueID)
+	_manager._sessionList[sessionIndex].SetConnectTimeSec(time.Now().Unix(), sessionUniqueID)
 	return true
 }
 
 func RemoveSession(sessionIndex int32, isLoginedUser bool) bool {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return false
 	}
 
@@ -85,7 +79,6 @@ func _validSessionIndex(index int32) bool {
 
 func GetNetworkUniqueID(sessionIndex int32) uint64 {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return 0
 	}
 
@@ -94,7 +87,6 @@ func GetNetworkUniqueID(sessionIndex int32) uint64 {
 
 func GetUserID(sessionIndex int32) ([]byte, bool) {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return nil, false
 	}
 
@@ -103,7 +95,6 @@ func GetUserID(sessionIndex int32) ([]byte, bool) {
 
 func SetLogin(sessionIndex int32, sessionUniqueId uint64, userID []byte, curTimeSec int64) bool {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return false
 	}
 
@@ -121,7 +112,6 @@ func SetLogin(sessionIndex int32, sessionUniqueId uint64, userID []byte, curTime
 
 func IsLoginUser(sessionIndex int32) bool {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return false
 	}
 
@@ -130,7 +120,6 @@ func IsLoginUser(sessionIndex int32) bool {
 
 func SetRoomNumber(sessionIndex int32, sessionUniqueId uint64, roomNum int32, curTimeSec int64) bool {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return false
 	}
 
@@ -139,7 +128,6 @@ func SetRoomNumber(sessionIndex int32, sessionUniqueId uint64, roomNum int32, cu
 
 func GetRoomNumber(sessionIndex int32) (int32, int32) {
 	if _validSessionIndex(sessionIndex) == false {
-		NTELIB_LOG_ERROR("Invalid sessionIndex", zap.Int32("sessionIndex", sessionIndex))
 		return -1, -1
 	}
 	return _manager._sessionList[sessionIndex].getRoomNumber()

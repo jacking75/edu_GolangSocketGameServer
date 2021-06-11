@@ -1,7 +1,6 @@
 package gohipernetFake
 
 import (
-	"go.uber.org/zap"
 	"sync"
 	"sync/atomic"
 )
@@ -61,16 +60,12 @@ func (sessionMgr *tcpClientSessionManager) addSession(session *TcpSession) bool 
 		return false
 	}
 
-	Logger.Info("SessionManager- addSession", zap.Int32("index", sessionIndex),
-		zap.Uint64("unique", sessionUniqueId))
-
 	session.Index = sessionIndex
 	sessionMgr._sessionMap.Store(sessionUniqueId, session)
 	return true
 }
 
 func (sessionMgr *tcpClientSessionManager) removeSession(sessionIndex int32, sessionUniqueId uint64) {
-	Logger.Info("SessionManager- removeSession", zap.Int32("index", sessionIndex), zap.Uint64("unique", sessionUniqueId))
 	sessionMgr._freeSessionIndex(sessionIndex)
 	sessionMgr._sessionMap.Delete(sessionUniqueId)
 }
@@ -119,7 +114,6 @@ func (sessionMgr *tcpClientSessionManager) _findSession(sessionIndex int32,
 
 func (sessionMgr *tcpClientSessionManager) forceDisconnectClient(sessionIndex int32,
 	sessionUniqueId uint64) bool {
-	Logger.Info("forceDisconnectClient")
 
 	session, resut := sessionMgr._findSession(sessionIndex, sessionUniqueId)
 	if resut == false {
@@ -131,13 +125,8 @@ func (sessionMgr *tcpClientSessionManager) forceDisconnectClient(sessionIndex in
 }
 
 func (sessionMgr *tcpClientSessionManager) _forceCloseAllSession() {
-	Logger.Info("_forceCloseAllSession - Start")
-
 	sessionMgr._sessionMap.Range(func(_, value interface{}) bool {
 		value.(*TcpSession).closeProcess()
 		return true
 	})
-
-	Logger.Info("_forceCloseAllSession - End")
-	IExportLog("Info", "_forceCloseAllSession - End")
 }

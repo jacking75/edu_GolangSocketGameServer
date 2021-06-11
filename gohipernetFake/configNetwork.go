@@ -1,7 +1,7 @@
 package gohipernetFake
 
 import (
-	"go.uber.org/zap"
+	"fmt"
 )
 
 
@@ -15,17 +15,12 @@ type NetworkConfig struct {
 }
 
 func (config NetworkConfig) WriteNetworkConfig(isClientSide bool) {
-	section := "ClientSide"
-	if isClientSide == false {
-		section = "ServerSide"
-	}
-
-	Logger.Info("config - " + section,
-		zap.Bool("IsTcp4Addr", config.IsTcp4Addr),
-		zap.String("ClientAddress", config.BindAddress),
-		zap.Int("MaxSessionCount", config.MaxSessionCount),
-		zap.Int("MaxPacketSize", config.MaxPacketSize),
-		zap.Int("MaxReceiveBufferSize", config.MaxReceiveBufferSize))
+	logInfo("", 0, fmt.Sprintf("config - isClientSide: %t", isClientSide))
+	logInfo("", 0, fmt.Sprintf("config - IsTcp4Addr: %t", config.IsTcp4Addr))
+	logInfo("", 0, fmt.Sprintf("config - ClientAddress: %s", config.BindAddress))
+	logInfo("", 0, fmt.Sprintf("config - MaxSessionCount: %d", config.MaxSessionCount))
+	logInfo("", 0, fmt.Sprintf("config - MaxPacketSize: %d", config.MaxPacketSize))
+	logInfo("", 0, fmt.Sprintf("config - MaxReceiveBufferSize: %d", config.MaxReceiveBufferSize))
 }
 
 

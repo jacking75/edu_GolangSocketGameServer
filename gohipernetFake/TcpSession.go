@@ -1,7 +1,6 @@
 package gohipernetFake
 
 import (
-	"go.uber.org/zap"
 	"net"
 )
 
@@ -89,8 +88,6 @@ func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (i
 }
 
 func (session *TcpSession) closeProcess() {
-	Logger.Info("closeProcess", zap.Int32("sessionIndex", session.Index), zap.Uint64("SeqIndex", session.SeqIndex))
-
 	session.TcpConn.Close()
 	session.NetworkFunctor.OnClose(session.Index, session.SeqIndex)
 
