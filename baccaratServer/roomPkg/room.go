@@ -106,7 +106,7 @@ func (room *baseRoom) initialize(index int32, config RoomConfig) {
 	room._initUserPool()
 	room._userSessionUniqueIdMap = make(map[uint64]*roomUser)
 
-	room._gameLogic.clear()
+	room._gameLogic.init()
 }
 
 func (room *baseRoom) _initialize(index int32, config RoomConfig) {
