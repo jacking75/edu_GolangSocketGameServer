@@ -4,12 +4,14 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace csharp_test_client
 {
+    [SupportedOSPlatform("windows10.0.177630")]
     public partial class mainForm : Form
     {
         ClientSimpleTcp Network = new ClientSimpleTcp();
@@ -24,7 +26,7 @@ namespace csharp_test_client
         Queue<PacketData> RecvPacketQueue = new Queue<PacketData>();
         Queue<byte[]> SendPacketQueue = new Queue<byte[]>();
 
-        System.Windows.Threading.DispatcherTimer dispatcherUITimer;
+        System.Windows.Forms.Timer dispatcherUITimer = new ();
 
 
         public mainForm()
@@ -43,9 +45,12 @@ namespace csharp_test_client
             NetworkSendThread.Start();
 
             IsBackGroundProcessRunning = true;
-            dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
+            /*dispatcherUITimer = new System.Windows.Threading.DispatcherTimer();
             dispatcherUITimer.Tick += new EventHandler(BackGroundProcess);
             dispatcherUITimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            dispatcherUITimer.Start();*/
+            dispatcherUITimer.Tick += new EventHandler(BackGroundProcess);
+            dispatcherUITimer.Interval = 100;
             dispatcherUITimer.Start();
 
             btnDisconnect.Enabled = false;
