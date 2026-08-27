@@ -10,6 +10,8 @@ import (
 func start_Network_Impl(clientConfig *NetworkConfig, networkFunctor SessionNetworkFunctors) {
 	defer PrintPanicStack()
 
+	_InitNetworkSendFunction()
+
 	// 아래 함수가 호출되면 무한 대기에 들어간다
 	_tcpSessionManager = newClientSessionManager(clientConfig, networkFunctor)
 	_start_TCPServer_block(clientConfig, networkFunctor)
@@ -35,7 +37,13 @@ func _start_TCPServer_block(config *NetworkConfig, networkFunctor SessionNetwork
 	log.Println("Server Listen ...")
 
 	for {
-		conn, _ := _mClientListener.Accept()
+		conn, err := _mClientListener.Accept()
+		if err != nil {
+			// NetLibStopListen() 등으로 리스너가 닫힌 경우 Accept()는 계속 에러를 반환하므로 루프를 종료한다.
+			logError("", 0, "Accept error: "+err.Error())
+			break
+		}
+
 		client := &TcpSession{
 			SeqIndex:       SeqNumIncrement(),
 			TcpConn:        conn,

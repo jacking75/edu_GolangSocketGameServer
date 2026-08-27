@@ -58,6 +58,11 @@ func (session *session) setUserID(userID []byte) {
 }
 
 func (session *session) getUserID() []byte {
+	// _userIDLength가 배열 범위를 벗어나면(비정상 경로로 잘못 설정된 경우) 패닉 대신 빈 값을 반환한다.
+	if session._userIDLength < 0 || int(session._userIDLength) > len(session._userID) {
+		return nil
+	}
+
 	return session._userID[0:session._userIDLength]
 }
 

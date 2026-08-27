@@ -111,6 +111,12 @@ func GetUserID(sessionIndex int32) ([]byte, bool) {
 		return nil, false
 	}
 
+	// 로그인(인증)하지 않은 세션은 UserID가 없는 것으로 취급한다.
+	// 이 검사가 없으면 로그인 절차를 거치지 않은 세션도 방 입장 등에서 그대로 통과된다.
+	if _manager._sessionList[sessionIndex].IsAuth() == false {
+		return nil, false
+	}
+
 	return _manager._sessionList[sessionIndex].getUserID(), true
 }
 

@@ -60,6 +60,10 @@ func protocolInitHeaderSize() int16 {
 
 // Header의 PacketID만 읽는다
 func PeekPacketID(rawData []byte) int16 {
+	if len(rawData) < int(ClientHeaderSize()) {
+		return 0
+	}
+
 	packetID := binary.LittleEndian.Uint16(rawData[2:])
 	return int16(packetID)
 }
@@ -67,7 +71,17 @@ func PeekPacketID(rawData []byte) int16 {
 // 보디데이터의 참조만 가져간다
 func PeekPacketBody(rawData []byte) (bodySize int16, refBody []byte) {
 	headerSize := ClientHeaderSize()
+	if int16(len(rawData)) < headerSize {
+		return 0, nil
+	}
+
 	totalSize := int16(binary.LittleEndian.Uint16(rawData))
+	if totalSize < headerSize {
+		// 조작/손상된 패킷: totalSize가 헤더 크기보다 작으면 bodySize가 음수가 되어
+		// 이후 make([]byte, bodySize)에서 패닉이 발생할 수 있으므로 여기서 걸러낸다.
+		return 0, nil
+	}
+
 	bodySize = totalSize - headerSize
 
 	if bodySize > 0 {

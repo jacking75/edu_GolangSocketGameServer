@@ -164,6 +164,10 @@ func (p *RawPacketData) ReadByte() (ret byte, err error) {
 }
 
 func (p *RawPacketData) ReadBytes(readSize int) (refSlice []byte) {
+	if readSize < 0 || p.pos+readSize > len(p.data) {
+		return nil
+	}
+
 	refSlice = p.data[p.pos : p.pos+readSize]
 	p.pos += readSize
 	return

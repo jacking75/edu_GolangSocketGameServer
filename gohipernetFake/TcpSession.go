@@ -2,6 +2,7 @@ package gohipernetFake
 
 import (
 	"net"
+	"sync"
 )
 
 
@@ -11,9 +12,15 @@ type TcpSession struct {
 	SeqIndex       uint64
 	TcpConn        net.Conn
 	NetworkFunctor SessionNetworkFunctors
+
+	closeOnce sync.Once
 }
 
 func (session *TcpSession) handleTcpRead(networkFunctor SessionNetworkFunctors) {
+	// 이 고루틴 안에서 패닉이 나도(예: 조작된 패킷) 이 세션만 정리하고 다른 접속자에게는 영향이 없도록 한다.
+	defer PrintPanicStack()
+	defer session.closeProcess()
+
 	session.NetworkFunctor.OnConnect(session.Index, session.SeqIndex)
 
 
@@ -25,13 +32,11 @@ func (session *TcpSession) handleTcpRead(networkFunctor SessionNetworkFunctors) 
 		recvBytes, err := session.TcpConn.Read(recviveBuff[startRecvPos:])
 		if err != nil {
 			//TODO 끊는 이유 남기기
-			session.closeProcess()
 			return
 		}
 
 		if recvBytes < PACKET_HEADER_SIZE {
 			//TODO 끊는 이유 남기기
-			session.closeProcess()
 			return
 		}
 
@@ -39,7 +44,6 @@ func (session *TcpSession) handleTcpRead(networkFunctor SessionNetworkFunctors) 
 		startRecvPos, result = session.makePacket(readAbleByte, recviveBuff)
 		if result != NET_ERROR_NONE {
 			//TODO 끊는 이유 남기기
-			session.closeProcess()
 			return
 		}
 
@@ -61,6 +65,14 @@ func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (i
 		}
 
 		requireDataSize := PacketTotalSizeFunc(recviveBuff[readPos:])
+
+		// 클라이언트가 보낸 패킷 길이가 헤더 크기보다 작으면(0 포함) 유효하지 않은 패킷이다.
+		// uint16 길이 필드가 int16으로 캐스팅되며 음수로 뒤집힌 경우도 여기서 함께 걸러진다.
+		// 검증 없이 진행하면 아래 readAbleByte/readPos가 줄지 않아 무한 루프에 빠지거나,
+		// 음수 상한으로 슬라이싱하여 패닉이 발생한다.
+		if requireDataSize < PacketHeaderSize {
+			return startRecvPos, NET_ERROR_RECV_MAKE_PACKET_INVALID_PACKET_SIZE
+		}
 
 		if requireDataSize > readAbleByte {
 			break
@@ -87,11 +99,16 @@ func (session *TcpSession) makePacket(readAbleByte int16, recviveBuff []byte) (i
 	return startRecvPos, NET_ERROR_NONE
 }
 
+// closeProcess는 읽기 루프의 에러 경로와 NetLibForceDisconnectClient 양쪽에서
+// 동시에 호출될 수 있다. sync.Once로 감싸 세션 인덱스가 풀에 이중 반환(double free)되거나
+// OnClose 콜백이 두 번 호출되는 것을 막는다.
 func (session *TcpSession) closeProcess() {
-	session.TcpConn.Close()
-	session.NetworkFunctor.OnClose(session.Index, session.SeqIndex)
+	session.closeOnce.Do(func() {
+		session.TcpConn.Close()
+		session.NetworkFunctor.OnClose(session.Index, session.SeqIndex)
 
-	_tcpSessionManager.removeSession(session.Index, session.SeqIndex)
+		_tcpSessionManager.removeSession(session.Index, session.SeqIndex)
+	})
 }
 
 // Send bytes to client

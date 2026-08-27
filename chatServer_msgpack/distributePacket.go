@@ -78,6 +78,15 @@ func ProcessPacketLogin(sessionIndex int32,
 	}
 
 	userID := []byte(request.UserID)
+
+	// UserID는 세션 안에 protocol.MAX_USER_ID_BYTE_LENGTH 크기의 고정 배열로 저장된다.
+	// msgpack은 임의 길이의 문자열을 그대로 넘겨주므로, 여기서 걸러내지 않으면
+	// 로그인(미인증) 단계에서 이후 getUserID() 호출 시 slice bounds out of range 패닉이 발생할 수 있다.
+	if len(userID) <= 0 || len(userID) > protocol.MAX_USER_ID_BYTE_LENGTH {
+		_sendLoginResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_LOGIN_USER_INVALID_ID)
+		return
+	}
+
 	curTime := time.Now().Unix()
 
 	if connectedSessions.SetLogin(sessionIndex, sessionUniqueId, userID, curTime) == false {
