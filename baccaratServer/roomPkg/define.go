@@ -33,8 +33,11 @@ func makeCard() []int8 {
 	return a
 }
 
-const BATTING_WAIT_MILLISEC = 5000
-const NEXT_GAME_WAIT_MILLISEC = 10000
+// 기존에는 "밀리초" 단위 상수(5000, 10000)를 만들어 놓고 실제로는 time.Now().Unix()(초 단위)에
+// 더해서 사용하는 바람에 배팅 대기/결과 표시 시간이 1000배(약 83분/166분)로 늘어나는 버그가 있었다.
+// 전체 흐름이 초 단위(Unix())로 통일되어 있으므로 상수도 초 단위로 맞춘다.
+const BATTING_WAIT_SEC = 5
+const NEXT_GAME_WAIT_SEC = 10
 
 const (
 	BATTING_SELECT_NONE = 0

@@ -43,7 +43,9 @@ func (roomMgr *RoomManager) GetAllChannelUserCount() []int16 {
 func (roomMgr *RoomManager) getRoomByNumber(roomNumber int32) *baseRoom {
 	roomIndex := roomNumber - roomMgr._roomStartNum
 
-	if roomNumber < 0 || roomIndex >= roomMgr._maxRoomCount {
+	// roomIndex < 0 검사가 없으면 RoomStartNum을 양수로 설정했을 때 roomNumber가 작은 값이라도
+	// roomIndex가 음수가 되어 아래 슬라이스 접근에서 음수 인덱스 패닉이 발생할 수 있다.
+	if roomIndex < 0 || roomIndex >= roomMgr._maxRoomCount {
 		return nil
 	}
 

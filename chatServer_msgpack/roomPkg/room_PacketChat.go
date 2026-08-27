@@ -18,6 +18,14 @@ func (room *baseRoom) _packetProcess_Chat(user *roomUser, packet protocol.Packet
 		return protocol.ERROR_CODE_PACKET_DECODING_FAIL
 	}
 
+	// 채팅 최대길이 제한. MAX_CHAT_MESSAGE_BYTE_LENGTH는 정의만 되어 있고 검증이 빠져 있어서
+	// 클라이언트가 임의 길이의 메시지를 그대로 방 전체에 브로드캐스트할 수 있었다.
+	msgLen := len(chatPacket.Msg)
+	if msgLen < 1 || msgLen > protocol.MAX_CHAT_MESSAGE_BYTE_LENGTH {
+		_sendRoomChatResult(sessionIndex, sessionUniqueId, protocol.ERROR_CODE_ROOM_CHAT_CHAT_MSG_LEN)
+		return protocol.ERROR_CODE_ROOM_CHAT_CHAT_MSG_LEN
+	}
+
 	var chatNotifyResponse protocol.RoomChatNtfPacket
 	chatNotifyResponse.UserUniqueId = user.RoomUniqueId
 	chatNotifyResponse.Msg = chatPacket.Msg

@@ -1,5 +1,6 @@
 # golang_socketGameServer_codelab
 >>> 리팩토링과 문서 정리 필요
+>>> 코드 리뷰 결과와 구체적인 개선 방법은 [CODE_REVIEW.md](CODE_REVIEW.md) 참고
 
 - golang을 이용하여 실시간 통신 게임 서버 만들기 실습.  
 - 각 서버의 원본 코드를 하나씩 따라서 코딩하면서 서버 만드는 방법을 배운다.
@@ -68,6 +69,8 @@
 -  API Server(http)와 연동  
     - 유저를 특정 게임 서버에 할당하는 기능
     - 매칭 기능	
+
+> 위 "추가 기능 구현" 항목은 실습 목표이며, 현재 커밋된 코드에는 아직 구현되어 있지 않다.
 	 
 	 
 	 
@@ -82,6 +85,9 @@
 - Redis 연동
 - API Server(http)와 연동  
     - 로그인을 API Server에서 한다.  
+
+> 위 "추가 기능 구현" 항목은 실습 목표이며, 현재 커밋된 코드에는 아직 구현되어 있지 않다.  
+> 또한 chatServer2는 현재 `NTELIB_LOG_INFO`, `NTELIB_LOG_ERROR`, `NetLib_IsRunningServer`, `NetLib_GetCurrnetUnixTime` 심볼이 어디에도 정의되어 있지 않아 빌드 자체가 실패하는 상태다(자세한 내용은 [CODE_REVIEW.md](CODE_REVIEW.md) 참고).
      
 	 
 ## msgpack을 사용한 chatServer	

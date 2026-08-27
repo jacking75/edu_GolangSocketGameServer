@@ -62,14 +62,6 @@ func (room *baseRoom) _initialize(index int32, config RoomConfig) {
 	room._config = config
 }
 
-func (room *baseRoom) EnableEnterUser() bool {
-	if room.getCurUserCount() >= room._config.MaxUserCount {
-		return false
-	}
-
-	return true
-}
-
 func (room *baseRoom) settingPacketFunction() {
 	maxFuncListCount := 16
 	room._funclist = make([]func(*roomUser, protocol.Packet) int16, 0, maxFuncListCount)
@@ -194,20 +186,6 @@ func _writeUserInfo(writer *RawPacketData, user *roomUser) {
 	writer.WriteBytes(user.ID[0:user.IDLen])
 }
 
-func (room *baseRoom) _disConnectedUser(sessionUniqueId uint64) bool {
-	user := room.getUser(sessionUniqueId)
-	if user == nil {
-		return false
-	}
-
-	room._leaveUserProcess(user)
-	return true
-}
-
-func (room *baseRoom) secondTimeEvent() {
-	//TODO 주기적으로 방의 유저가 연결 되어 있는지 확인 필요
-}
-
 func (room *baseRoom) broadcastPacket(packetSize int16,
 	sendPacket []byte,
 	exceptSessionUniqueId uint64,
@@ -222,10 +200,3 @@ func (room *baseRoom) broadcastPacket(packetSize int16,
 	}
 }
 
-func (room *baseRoom) disConnectedUser(sessionUniqueId uint64) int16 {
-	if room._disConnectedUser(sessionUniqueId) == false {
-		return protocol.ERROR_CODE_LEAVE_ROOM_INTERNAL_INVALID_USER
-	}
-
-	return protocol.ERROR_CODE_NONE
-}

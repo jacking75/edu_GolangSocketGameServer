@@ -1,0 +1,19 @@
+# 학습용 코드랩 저장소를 위한 최소 golangci-lint 설정.
+# 목표는 "지금 당장 전부 통과"가 아니라 앞으로의 변경을 점검할 수 있는 기본 도구를 갖추는 것이다.
+# 필요하면 각자 모듈 작업 시 이 설정을 조정해서 사용해도 된다.
+run:
+  timeout: 5m
+
+linters:
+  disable-all: true
+  enable:
+    - govet
+    - staticcheck
+    - unused
+    - ineffassign
+    - errcheck
+
+issues:
+  # 기존 코드에 이미 있던 경고까지 한 번에 다 고치는 것은 이번 작업 범위가 아니므로,
+  # 새로 추가되는 코드에 대한 신호로 우선 활용한다. 필요 시 제거해서 전체 검사로 전환할 수 있다.
+  exclude-use-default: true

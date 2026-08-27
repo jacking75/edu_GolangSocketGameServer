@@ -316,15 +316,15 @@ func (room *baseRoom) endGame() {
 	room.changeState(ROOM_STATE_GAME_RESULT)
 }
 
-func (room *baseRoom) checkState(curTimeMilliSec int64) {
+func (room *baseRoom) checkState(curTimeSec int64) {
 	if room.isStateNone() {
 		return
 	} else if room.isStateGameBattingWait() {
-		if room._gameLogic.isTimeOver(curTimeMilliSec) {
+		if room._gameLogic.isTimeOver(curTimeSec) {
 			room.endGame()
 		}
 	} else if room.isStateGameResult() {
-		if room._gameLogic.isTimeOver(curTimeMilliSec) {
+		if room._gameLogic.isTimeOver(curTimeSec) {
 			room.changeState(ROOM_STATE_NOE)
 		}
 	}

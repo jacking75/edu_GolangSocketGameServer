@@ -1,16 +1,18 @@
 module main
 
-go 1.13
+go 1.21
 
 require (
-	github.com/pkg/errors v0.8.1 // indirect
-	github.com/stretchr/testify v1.4.0 // indirect
 	github.com/vmihailenco/msgpack/v4 v4.2.1
-	go.uber.org/atomic v1.4.0 // indirect
-	go.uber.org/multierr v1.1.0 // indirect
-	go.uber.org/zap v1.10.0
 	gohipernetFake v0.0.0
-	gopkg.in/yaml.v2 v2.2.7 // indirect
+)
+
+require (
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/golang/protobuf v1.3.2 // indirect
+	github.com/vmihailenco/tagparser v0.1.0 // indirect
+	golang.org/x/net v0.0.0-20190724013045-ca1201d0de80 // indirect
+	google.golang.org/appengine v1.6.1 // indirect
 )
 
 replace gohipernetFake v0.0.0 => ../gohipernetFake

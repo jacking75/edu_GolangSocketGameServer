@@ -37,6 +37,10 @@ func (room *baseRoom) _packetProcess_EnterUser(inValidUser *roomUser, packet pro
 	}
 
 	if connectedSessions.SetRoomNumber(sessionIndex, sessionUniqueId, room.getNumber(), curTime) == false {
+		// 세션 쪽 방 번호 갱신에 실패했다면(예: 입장 처리 중 연결이 끊겨 세션이 이미 정리된 경우)
+		// 앞서 room.addUser로 추가한 엔트리를 반드시 되돌린다. 그렇지 않으면 유령 유저가
+		// 방에 영구히 남아 정원을 잠식한다.
+		room._removeUser(newUser)
 		_sendRoomEnterResult(sessionIndex, sessionUniqueId, 0, 0, protocol.ERROR_CODE_ENTER_ROOM_INVALID_SESSION_STATE)
 		return protocol.ERROR_CODE_ENTER_ROOM_INVALID_SESSION_STATE
 	}

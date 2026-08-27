@@ -86,7 +86,7 @@ func _checkSessionState(startIndex int32, maxIndex int32, config CheckSessionSta
 				continue
 			}
 		} else {
-			if _checkNotLogIn(i, int64(config.LoginWaitTimeSec), curTime) {
+			if _checkNotLogIn(i, int64(config.LoginWaitTimeSec), int64(config.DisConnectWaitTimeSec), curTime) {
 				continue
 			}
 		}
@@ -110,13 +110,29 @@ func _checkDisConnectWait(sessionIndex int32, disConnectWaitTimeSec int64, curTi
 
 func _checkNotLogIn(sessionIndex int32,
 	loginWaitTimeSec int64,
+	disConnectWaitTimeSec int64,
 	curTime int64,
 	) bool {
-	connectedTime := GetConnectTimeSec(sessionIndex)
 	disConnectTime := GetDisConnectWaitStartTimeSec(sessionIndex)
+
+	if disConnectTime != 0 {
+		// 이미 로그인 대기 시간 초과로 연결 종료 대기 상태에 들어간 세션이다.
+		// 로그인하지 않은 세션은 IsLoginUser()가 계속 false라 이 분기만 반복 호출되므로,
+		// _checkDisConnectWait와 동일하게 대기 시간이 지나면 실제로 강제 종료해야 한다.
+		// 그렇지 않으면 세션 슬롯을 영구히 점유한 채 정리되지 않는다.
+		maxWaitTimeSec := disConnectTime + disConnectWaitTimeSec
+		if maxWaitTimeSec <= curTime {
+			_forceDisconnect(sessionIndex, "Not Login - DisConnect Wait Timeout")
+			return true
+		}
+
+		return false
+	}
+
+	connectedTime := GetConnectTimeSec(sessionIndex)
 	maxWaitTimeSec := connectedTime + loginWaitTimeSec
 
-	if disConnectTime == 0 && maxWaitTimeSec <= curTime {
+	if maxWaitTimeSec <= curTime {
 		_disablePacketProcess(sessionIndex, protocol.ERROR_CODE_DISCONNECT_UNAUTHENTICATED_USER, "Not Login")
 		return true
 	}

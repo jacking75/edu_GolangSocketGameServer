@@ -46,16 +46,6 @@ func (user *roomUser) PacketDataSize() int16 {
 
 
 
-type RoomMemberPacket struct {
-	RoomIndex int
-
-	UserID    []byte
-	SessionIndex    int32
-	SessionUniqueId uint64
-}
-
-
-
 type userNetworkInfo struct {
 	sessionIndex    int32
 	sessionUniqueId uint64

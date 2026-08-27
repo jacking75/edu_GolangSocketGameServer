@@ -52,15 +52,6 @@ func (distributor *roomPacketDistributor) ValidRoomIndex(roomIndex int32) bool {
 	return true
 }
 
-func (distributor *roomPacketDistributor) PushMemberPacket(roomIndex int32, packet RoomMemberPacket) {
-	if distributor.ValidRoomIndex(roomIndex) == false {
-		NTELIB_LOG_ERROR("fail pushMemberPacket", zap.Int32("roomIndex", roomIndex))
-		return
-	}
-
-	distributor._roomIndexListRoomPacketPipeRef[roomIndex]._chanMemebrPacket <- packet
-}
-
 func (distributor *roomPacketDistributor) PushPacket(roomIndex int32, packet protocol.Packet) {
 	if distributor.ValidRoomIndex(roomIndex) == false {
 		NTELIB_LOG_ERROR("fail PushPacket", zap.Int32("roomIndex", roomIndex), zap.Int16("PacketID", packet.Id))

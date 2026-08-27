@@ -42,7 +42,9 @@ func (roomMgr *RoomManager) GetAllChannelUserCount() []int16 {
 func (roomMgr *RoomManager) getRoomByNumber(roomNumber int32) *baseRoom {
 	roomIndex := roomNumber - roomMgr._roomStartNum
 
-	if roomNumber < 0 || roomIndex >= roomMgr._maxRoomCount {
+	// roomIndex < 0 검사가 없으면 RoomStartNum을 양수로 설정했을 때 roomNumber가 작은 값이라도
+	// roomIndex가 음수가 되어 아래 슬라이스 접근에서 음수 인덱스 패닉이 발생할 수 있다.
+	if roomIndex < 0 || roomIndex >= roomMgr._maxRoomCount {
 		return nil
 	}
 
@@ -91,10 +93,10 @@ func (roomMgr *RoomManager) PacketProcess(roomNumber int32, packet protocol.Pack
 	}
 }
 
-func (roomMgr *RoomManager) CheckRoomState(curTimeMilliSec int64) {
+func (roomMgr *RoomManager) CheckRoomState(curTimeSec int64) {
 	//TODO 한번에 모든 방을 다 조사할 필요가 없다. 밀리세컨드 단위로 타이머를 돌게 하고 그룹 단위로 방을 조사한다
 
 	for i := 0; i < (int)(roomMgr._maxRoomCount); i++ {
-		roomMgr._roomList[i].checkState(curTimeMilliSec)
+		roomMgr._roomList[i].checkState(curTimeSec)
 	}
 }

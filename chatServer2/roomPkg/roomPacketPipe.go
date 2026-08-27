@@ -16,7 +16,6 @@ type roomPacketPipe struct {
 	_channelPacketCount    int32
 	_chanPacket            chan protocol.Packet
 	_chanInternalPacket    chan protocol.InternalPacket
-	_chanMemebrPacket      chan RoomMemberPacket
 	_onDoneTerminateNotify chan struct{}
 }
 
@@ -26,7 +25,6 @@ func NewRoomPacketPipe(roomCount int, config RoomConfig) *roomPacketPipe {
 	packetPipe._roomRefList = make([]*baseRoom, roomCount)
 	packetPipe._chanPacket = make(chan protocol.Packet, config.ChanPacketBufferCount)
 	packetPipe._chanInternalPacket = make(chan protocol.InternalPacket, config.InternalPacketChanBufferCount)
-	packetPipe._chanMemebrPacket = make(chan RoomMemberPacket, config.MaxUserCount)
 	packetPipe._onDoneTerminateNotify = make(chan struct{})
 
 	return packetPipe

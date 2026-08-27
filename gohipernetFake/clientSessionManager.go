@@ -78,13 +78,21 @@ func (sessionMgr *tcpClientSessionManager) sendPacket(sessionIndex int32,
 		return false
 	}
 
-	session.sendPacket(sendData)
+	// 쓰기 실패(예: 상대가 이미 연결을 끊은 broken pipe)를 무시하면 죽은 세션이
+	// 정리되지 않고 방치된다. 실패 시 해당 세션을 명시적으로 정리한다.
+	if err := session.sendPacket(sendData); err != nil {
+		session.closeProcess()
+		return false
+	}
 	return true
 }
 
 func (sessionMgr *tcpClientSessionManager) sendPacketAllClient(sendData []byte) {
 	sessionMgr._sessionMap.Range(func(_, value interface{}) bool {
-		value.(*TcpSession).sendPacket(sendData)
+		session := value.(*TcpSession)
+		if err := session.sendPacket(sendData); err != nil {
+			session.closeProcess()
+		}
 		return true
 	})
 }

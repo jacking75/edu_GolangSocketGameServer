@@ -6,7 +6,7 @@ import (
 )
 
 type baccaratGame struct {
-	_statusChangeCompletionMillSec int64 // 다음 상태로 바뀔 때까지의 시간. 0 이면 사용하지 않음.
+	_statusChangeCompletionTimeSec int64 // 다음 상태로 바뀔 때까지의 시간(Unix 초). 0 이면 사용하지 않음.
 	_rand                          *rand.Rand
 	_dillerCardPos                 int
 	_cards                         []int8
@@ -20,17 +20,17 @@ func (game *baccaratGame) init() {
 }
 
 func (game *baccaratGame) clear() {
-	game._statusChangeCompletionMillSec = 0
+	game._statusChangeCompletionTimeSec = 0
 	game._dillerCardPos = 0
 	game._cardChuffle()
 }
 
-func (game *baccaratGame) isTimeOver(curTimeMilliSec int64) bool {
-	return game._statusChangeCompletionMillSec != 0 && game._statusChangeCompletionMillSec <= curTimeMilliSec
+func (game *baccaratGame) isTimeOver(curTimeSec int64) bool {
+	return game._statusChangeCompletionTimeSec != 0 && game._statusChangeCompletionTimeSec <= curTimeSec
 }
 
-func (game *baccaratGame) setBattingWaitTime(curMilliSec int64) {
-	game._statusChangeCompletionMillSec = curMilliSec + BATTING_WAIT_MILLISEC
+func (game *baccaratGame) setBattingWaitTime(curTimeSec int64) {
+	game._statusChangeCompletionTimeSec = curTimeSec + BATTING_WAIT_SEC
 }
 
 func (game *baccaratGame) doBaccarat() baccaratGameResultInfo {
@@ -86,7 +86,7 @@ func (game *baccaratGame) doBaccarat() baccaratGameResultInfo {
 
 	_End(&gameResult)
 
-	game._statusChangeCompletionMillSec = time.Now().Unix() + NEXT_GAME_WAIT_MILLISEC
+	game._statusChangeCompletionTimeSec = time.Now().Unix() + NEXT_GAME_WAIT_SEC
 	return gameResult
 }
 
@@ -151,14 +151,19 @@ func (result *baccaratGameResultInfo) ThreeCardtoBanker(card3 int8) {
 		_baccaratCardIndexToScore(result.cardsBanker[2])) % 10
 }
 
+// cardIndex(0~51)를 13(CARD_ROW_COUNT)으로 나눈 나머지가 카드 랭크다.
+// 0=A, 1~8="2"~"9", 9="10", 10~12=J/Q/K.
+// 기존 코드는 "2"~"9"(랭크 1~8)를 실제 값보다 1 작게 계산하고, "10"(랭크 9)을
+// 0점이 아닌 9점으로 계산하는 버그가 있었다.
 func _baccaratCardIndexToScore(cardIndex int8) int8 {
-	score := cardIndex % CARD_ROW_COUNT
+	rank := cardIndex % CARD_ROW_COUNT
 
-	if score == 0 {
-		score = 1
-	} else if 10 <= score {
-		score = 0
+	switch {
+	case rank == 0:
+		return 1
+	case rank >= 9:
+		return 0
+	default:
+		return rank + 1
 	}
-
-	return score
 }

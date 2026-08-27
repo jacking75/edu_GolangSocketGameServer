@@ -166,12 +166,13 @@ func SetLogin(sessionIndex int32, sessionUniqueId uint64, userID []byte, curTime
 	}
 
 	newUserID := string(userID)
-	if _, ok := _manager._UserIDsessionMap.Load(newUserID); ok {
+	// Load 후 Store를 분리하면 서로 다른 두 세션이 동시에 같은 userID로 로그인 요청을 보낼 때
+	// 둘 다 "없음"을 확인하고 통과하는 TOCTOU 레이스가 생긴다. LoadOrStore로 원자화한다.
+	if _, loaded := _manager._UserIDsessionMap.LoadOrStore(newUserID, _manager._sessionList[sessionIndex]); loaded {
 		return false
 	}
 
 	_manager._sessionList[sessionIndex].SetUser(sessionUniqueId, userID, curTimeSec)
-	_manager._UserIDsessionMap.Store(newUserID, _manager._sessionList[sessionIndex])
 
 	atomic.AddInt32(&_manager._currentLoginUserCount, 1)
 	return true

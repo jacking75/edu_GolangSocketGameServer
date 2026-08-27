@@ -90,14 +90,6 @@ func (session *session) IsAuth() bool {
 	return false
 }
 
-func (session *session) setRoomEntering(roomNum int32) bool {
-	if atomic.CompareAndSwapInt32(&session._RoomNumOfEntering, -1, roomNum) == false {
-		return false
-	}
-
-	return true
-}
-
 func (session *session) setRoomNumber(sessionUniqueId uint64, roomNum int32, curTimeSec int64) bool {
 	if roomNum == -1 {
 		atomic.StoreInt32(&session._RoomNum, roomNum)
@@ -120,6 +112,6 @@ func (session *session) setRoomNumber(sessionUniqueId uint64, roomNum int32, cur
 
 func (session *session) getRoomNumber() (int32, int32) {
 	roomNum := atomic.LoadInt32(&session._RoomNum)
-	roomNumOfEntering := atomic.LoadInt32(&session._RoomNum)
+	roomNumOfEntering := atomic.LoadInt32(&session._RoomNumOfEntering)
 	return roomNum, roomNumOfEntering
 }

@@ -50,7 +50,14 @@ func _start_TCPServer_block(config *NetworkConfig, networkFunctor SessionNetwork
 			NetworkFunctor: networkFunctor,
 		}
 
-		_tcpSessionManager.addSession(client)
+		// 세션 인덱스 풀이 소진된 경우(MaxSessionCount 초과) addSession은 false를 반환하며
+		// client.Index를 세팅하지 않는다. 반환값을 확인하지 않으면 그 연결이 index 0인 것처럼
+		// 동작해 다른 정상 세션의 인덱스를 나중에 훔쳐 반환하는 문제로 이어진다.
+		if _tcpSessionManager.addSession(client) == false {
+			logError("", 0, "addSession failed. session pool exhausted")
+			_ = conn.Close()
+			continue
+		}
 
 		go client.handleTcpRead(networkFunctor)
 	}

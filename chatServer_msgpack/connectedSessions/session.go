@@ -125,6 +125,6 @@ func (session *session) setRoomNumber(sessionUniqueId uint64, roomNum int32, cur
 
 func (session *session) getRoomNumber() (int32, int32) {
 	roomNum := atomic.LoadInt32(&session._RoomNum)
-	roomNumOfEntering := atomic.LoadInt32(&session._RoomNum)
+	roomNumOfEntering := atomic.LoadInt32(&session._RoomNumOfEntering)
 	return roomNum, roomNumOfEntering
 }

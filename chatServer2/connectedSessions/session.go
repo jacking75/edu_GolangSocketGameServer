@@ -1,6 +1,7 @@
 package connectedSessions
 
 import (
+	"sync"
 	"sync/atomic"
 
 	"main/protocol"
@@ -11,6 +12,10 @@ type session struct {
 
 	_networkUniqueID     uint64  //네트워크 세션의 유니크 ID
 
+	// _userID/_userIDLength는 로그인 처리 고루틴(쓰기)과 주기적 세션 상태 점검 고루틴(읽기,
+	// checkState.go)이 동시에 접근할 수 있다. 다른 필드처럼 atomic만으로는 [16]byte 배열을
+	// 안전하게 다룰 수 없어 별도 뮤텍스로 두 필드를 함께 보호한다.
+	_userIDMu     sync.RWMutex
 	_userID       [protocol.MAX_USER_ID_BYTE_LENGTH]byte
 	_userIDLength int8
 
@@ -31,6 +36,8 @@ func (session *session) Init(index int32) {
 }
 
 func (session *session) _ClearUserId() {
+	session._userIDMu.Lock()
+	defer session._userIDMu.Unlock()
 	session._userIDLength = 0
 }
 
@@ -61,15 +68,26 @@ func (session *session) GetNetworkInfo() (int32, uint64) {
 }
 
 func (session *session) setUserID(userID []byte) {
+	session._userIDMu.Lock()
+	defer session._userIDMu.Unlock()
 	session._userIDLength = int8(len(userID))
 	copy(session._userID[:], userID)
 }
 
 func (session *session) getUserID() []byte {
-	return session._userID[0:session._userIDLength]
+	session._userIDMu.RLock()
+	defer session._userIDMu.RUnlock()
+
+	// 내부 배열을 그대로 슬라이싱해서 반환하면 잠금을 해제한 뒤 setUserID가 다시 호출될 때
+	// 호출자가 들고 있는 슬라이스의 내용이 바뀔 수 있으므로, 잠긴 상태에서 사본을 만들어 반환한다.
+	result := make([]byte, session._userIDLength)
+	copy(result, session._userID[0:session._userIDLength])
+	return result
 }
 
 func (session *session) getUserIDLength() int8 {
+	session._userIDMu.RLock()
+	defer session._userIDMu.RUnlock()
 	return session._userIDLength
 }
 
@@ -91,7 +109,7 @@ func (session *session) SetUser(sessionUniqueId uint64,
 }
 
 func (session *session) IsAuth() bool {
-	if session._userIDLength > 0 {
+	if session.getUserIDLength() > 0 {
 		return true
 	}
 
@@ -128,7 +146,7 @@ func (session *session) setRoomNumber(sessionUniqueId uint64, roomNum int32, cur
 
 func (session *session) getRoomNumber() (int32, int32) {
 	roomNum := atomic.LoadInt32(&session._RoomNum)
-	roomNumOfEntering := atomic.LoadInt32(&session._RoomNum)
+	roomNumOfEntering := atomic.LoadInt32(&session._RoomNumOfEntering)
 	return roomNum, roomNumOfEntering
 }
 
