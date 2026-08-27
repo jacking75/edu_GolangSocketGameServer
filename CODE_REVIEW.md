@@ -12,6 +12,8 @@
 - **chatServer2는 이번 작업 범위 밖의 사전 존재 문제로 여전히 빌드되지 않는다.** `NTELIB_LOG_INFO`, `NTELIB_LOG_ERROR`, `NTELIB_LOG_DEBUG`, `NetLib_IsRunningServer`, `NetLib_GetCurrnetUnixTime`, `NetLibInitNetwork` 심볼이 15개 넘는 파일에서 참조되지만 저장소 어디에도 정의되어 있지 않다(gohipernetFake에도 없음). 이 저장소를 정적으로 읽는 리뷰만으로는 드러나지 않고 실제 `go build`를 해봐야 드러나는 문제라, 이번 코드 리뷰 자체에는 기록되지 않았던 별도의 이슈다. chatServer2에 대한 3단계 수정(4.1~4.4)은 코드 자체는 모두 반영했고 `gofmt`로 구문 유효성은 확인했지만, 위 문제 때문에 `go build`/`go vet`/`go test`로 실제 검증하지는 못했다. 이 심볼들을 무엇으로 채워야 할지(로깅 방식, 실행 상태 플래그 등)는 설계 판단이 필요해 별도로 다뤄야 한다.
 - 3~5단계를 적용하는 과정에서 확인된 동일 패턴의 버그(예: `getRoomByNumber`의 `roomIndex < 0` 경계 검사 누락)는 로드맵에 명시적으로 배정되어 있지 않았더라도 해당 파일을 수정하는 김에 함께 고쳤다.
 - 5단계의 "죽은 코드 정리"는 사용처가 전혀 없음을 grep으로 확인한 항목만 제거했다. `chatServer/logger.go`의 `init_Log`처럼 미완성이지만 실제로 쓸모 있어 보이는 코드(zap 기반 파일 로깅 전체 구성)는 임의로 지우거나 활성화하지 않고 그대로 두었다.
+- **1.2(GitHub Actions CI)는 저장소 소유자의 요청으로 이후 다시 제거했다.** `.github/workflows/ci.yml`과 `.golangci.yml`을 한 차례 추가했었으나, 소유자가 CI 자체를 원하지 않아 삭제했다. `go build`/`go vet`/`go test`를 자동으로 돌리는 장치가 필요하면 이 섹션의 원래 제안을 참고해 다시 추가할 수 있다.
+- `chatServer_msgpack`의 `golang.org/x/net`(2019년에 고정된 매우 오래된 커밋 버전)이 알려진 취약점이 있는 간접 의존성이었다. `go get -u golang.org/x/net golang.org/x/text google.golang.org/appengine github.com/golang/protobuf && go mod tidy`로 최신 버전으로 올려 해결했다(이 과정에서 `go.mod`의 Go 버전 요구사항이 `go 1.25.0`으로 자동 상향되었다 — 최신 `golang.org/x/net`이 요구하는 최소 버전). `govulncheck`로 6개 모듈을 전수 검사해 이 외의 서드파티 패키지 취약점은 없음을 확인했다(표준 라이브러리/툴체인 버전에 딸린 항목은 이 저장소의 의존성 선택과 무관하므로 제외).
 
 ## 총평
 
