@@ -1,5 +1,4 @@
 # golang_socketGameServer_codelab
->>> Needs refactoring and documentation cleanup
 
 [한국어 문서](README_kr.md)
 
